@@ -130,6 +130,14 @@ EOS
     # ベース読み込み
     @base_ptr = nil
     60.times do
+      if @data
+        @idm_pmm[:idm] = @data['idm']
+        @idm_pmm[:pmm] = @data['pmm']
+        puts "IDm[#{@idm_pmm[:idm]}]"
+        puts "PMm[#{@idm_pmm[:pmm]}]"
+        return true
+      end
+      
       @base_ptr = PasoriAPI::felica_polling(@pasori_ptr, PasoriAPI::POLLING_ANY, 0, 0)
       if !@base_ptr.null?
         base = PasoriAPI::Felica.new(@base_ptr)
@@ -238,6 +246,12 @@ EOS
 
   # 入出金履歴取得
   def pasori_history_read
+    if @data
+      @history = @data['history']
+      puts @history
+      return true
+    end
+    
     index = 0
     data = ' ' * 16
     while 0 == PasoriAPI::felica_read_without_encryption02(@base_ptr, SERVICE_SUICA_HISTORY, 0, index, data) do

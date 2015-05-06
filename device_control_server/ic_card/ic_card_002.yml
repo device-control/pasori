@@ -16,4 +16,23 @@ contents:
     start_date: "2015/4/1"
     end_date: "20015/8/31"
     write_counter: 0
-
+  pasori_contents:
+    status: 0
+    idm: [00,00,00,00,00,00,00,00]
+    pmm: [12,34,56,78,90,12,34,56]
+    history:
+      - ctype: 1
+        ctype_name: "改札機"
+        proc: 2
+        proc_name: "運賃支払"
+        date: 3
+        date_string: "14/04/01"
+        time: 4
+        time_string: "12:34"
+        balance: 1000
+        region: 5
+        seq: 6
+        in_line: 100
+        in_sta: 101
+        out_line: 200
+        out_sta: 201

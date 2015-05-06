@@ -79,7 +79,7 @@ class ServerWidget < Qt::Widget
       
       File.open(drop_file.force_encoding('utf-8').encode('cp932')) do |file|
         yaml = YAML.load(file.read)
-        ic_card_device.set_data yaml.to_json
+        ic_card_device.set_data yaml['contents']['pasori_contents']
       end
     else
       event.ignore()
@@ -91,4 +91,3 @@ class ServerWidget < Qt::Widget
   end
   
 end
-
