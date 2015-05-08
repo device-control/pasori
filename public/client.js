@@ -40,9 +40,9 @@ jQuery(function ($) {
         console.log("メッセージ受信");
         var json = JSON.parse(event.data);
         var contents = json.contents;
-        var history = contents.history;
-        $('table.idm-ppm tbody').append('<th>' + contents.idm +'</th>');
-        $('table.idm-ppm tbody').append('<th>' + contents.pmm +'</th>');
+        var history = contents.pasori_data.history;
+        $('table.idm-ppm tbody').append('<th>' + contents.pasori_data.idm +'</th>');
+        $('table.idm-ppm tbody').append('<th>' + contents.pasori_data.pmm +'</th>');
         var index = 0;
         var max = history.length;
         for(index = 0; index < max; index++){

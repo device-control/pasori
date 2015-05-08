@@ -18,7 +18,6 @@ class ServerWidget < Qt::Widget
   
   def initialize(parent = nil)
     super(parent)
-    
     # 画面構成読み込み＆設定
     @formWidget = nil
     Qt::File.new("qt_server.ui") do |file|
@@ -79,7 +78,7 @@ class ServerWidget < Qt::Widget
       
       File.open(drop_file.force_encoding('utf-8').encode('cp932')) do |file|
         yaml = YAML.load(file.read)
-        ic_card_device.set_data yaml['contents']['pasori_contents']
+        ic_card_device.set_data yaml
       end
     else
       event.ignore()
