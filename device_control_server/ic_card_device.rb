@@ -1,42 +1,45 @@
 # coding: utf-8
+require 'pasori_reader'
+require 'dropfile_reader'
 
 class ICCardDevice
+  
   attr_accessor :ws_conn
   attr_accessor :connect_signature
+  
   def initialize
     # ここで本当のデバイスの初期化や接続処理を行う
     @connect_signature = nil
-    @data = nil
+    # 使用するReaderを生成
+    @reader = Array.new
+    @reader.push PasoriReader.new
+    @reader.push DropFileReader.new
   end
   
   def set_data(data)
-    @data = data
+    @reader.each do |r|
+      r.set_data(data)
+    end
   end
-
+  
   def clear_data
-    @data = nil
+    @reader.each do |r|
+      r.clear_data
+    end
   end
   
   def read
-    send_data = <<'EOS'
-# coding: utf-8
-content-type: ic_card
-content-version: 0.1
-
-contents:
-  description: "標準的なカード 000"
-  read_status: 1 # 0:読み込み成功, 1:読み込み失敗
-  contents:
-EOS
-    # 60 sec 読み込み待ちする
     60.times do
-      if !@data.nil?
-        send_data = @data
-        break
+      @reader.each do |r|
+        json = r.read
+        unless json.nil?
+          return json
+        end
       end
       sleep(1)
     end
-    return send_data
+    puts 'ERROR: Read失敗'.encode('cp932')
+    return "" # json形式の空データを返す？
   end
   
   def write(body)
@@ -44,4 +47,5 @@ EOS
     sleep(5)
     return 
   end
+  
 end

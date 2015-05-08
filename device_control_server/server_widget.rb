@@ -18,7 +18,6 @@ class ServerWidget < Qt::Widget
   
   def initialize(parent = nil)
     super(parent)
-    
     # 画面構成読み込み＆設定
     @formWidget = nil
     Qt::File.new("qt_server.ui") do |file|
@@ -45,9 +44,9 @@ class ServerWidget < Qt::Widget
     ui = Hash.new
     ui['label_user_msg'] = findChild(Qt::Label, "label_user_msg")
     ui['listWidget_log'] = findChild(Qt::ListWidget, "listWidget_log")
-    ui['lcdNumber_port'] = findChild(Qt::LCDNumber, "lcdNumber_port")
+    ui['lineEdit_ip'] = findChild(Qt::LineEdit, "lineEdit_ip")
     # set port number
-    ui['lcdNumber_port'].value = parameter['contents']['port']
+    ui['lineEdit_ip'].text = parameter['contents']['ip'] + ':' + parameter['contents']['port']
     return ui
   end
   
@@ -79,7 +78,7 @@ class ServerWidget < Qt::Widget
       
       File.open(drop_file.force_encoding('utf-8').encode('cp932')) do |file|
         yaml = YAML.load(file.read)
-        ic_card_device.set_data yaml.to_json
+        ic_card_device.set_data yaml
       end
     else
       event.ignore()
@@ -91,4 +90,3 @@ class ServerWidget < Qt::Widget
   end
   
 end
-
