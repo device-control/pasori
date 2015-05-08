@@ -3,6 +3,7 @@ require 'pasori_reader'
 require 'dropfile_reader'
 
 class ICCardDevice
+  RETRY_COUNT_READ = 60
   
   attr_accessor :ws_conn
   attr_accessor :connect_signature
@@ -29,17 +30,39 @@ class ICCardDevice
   end
   
   def read
-    60.times do
-      @reader.each do |r|
-        json = r.read
-        unless json.nil?
-          return json
+    json = nil
+    # read 初期化
+    read_init
+    # read 処理実行
+    catch :loop do
+      RETRY_COUNT_READ.times do
+        @reader.each do |r|
+          json = r.read
+          throw :loop if !json.nil?
         end
+        sleep(1)
       end
-      sleep(1)
     end
-    puts 'ERROR: Read失敗'.encode('cp932')
-    return "" # json形式の空データを返す？
+    # read 後処理
+    read_finish
+    # read 結果
+    if json.nil?
+      puts 'ERROR: Read失敗'.encode('cp932')
+      return ""
+    end
+    return json
+  end
+  
+  def read_init
+    @reader.each do |r|
+      r.read_init
+    end
+  end
+  
+  def read_finish
+    @reader.each do |r|
+      r.read_finish
+    end
   end
   
   def write(body)

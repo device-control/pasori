@@ -32,6 +32,17 @@ class PasoriReader
     return pasori_history
   end
   
+  def read_init
+    @pasori_ptr = PasoriAPI::pasori_open(0)
+  end
+  
+  def read_finish
+    if !@pasori_ptr.nil?
+      PasoriAPI::pasori_close(@pasori_ptr)
+      @pasori_ptr = nil
+    end
+  end
+  
   def write(body)
     # dummy...
     sleep(5)
@@ -40,8 +51,6 @@ class PasoriReader
   
   def pasori_connect
     # pasori 接続
-    @pasori_ptr = PasoriAPI::pasori_open(0)
-    puts "#{@pasori_ptr}"
     pasori_res = PasoriAPI::pasori_init(@pasori_ptr)
     if pasori_res == 0
       return # 成功
@@ -147,10 +156,6 @@ class PasoriReader
     if ! @base_ptr.nil?
       PasoriAPI::felica_free(@base_ptr)
       @base_ptr = nil
-    end
-    if ! @pasori_ptr.nil?
-      PasoriAPI::pasori_close(@pasori_ptr)
-      @pasori_ptr = nil
     end
   end
   
