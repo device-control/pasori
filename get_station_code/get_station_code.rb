@@ -50,6 +50,7 @@ def out_station_code(file,base_url)
   @station_codes.each do |values|
     key = values[:area_code] + '-' + values[:station_code]
     data[key] = Hash.new
+    data[key][:company] = values[:company]
     data[key][:line_name] = values[:line_name]
     data[key][:station_name] = values[:station_name]
     data[key][:note] = values[:note]
