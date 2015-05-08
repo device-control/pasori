@@ -5,10 +5,10 @@ jQuery(function ($) {
   function GSIOrthoMapType() {
 
     GSIOrthoMapType.prototype.tileSize = new google.maps.Size(256,256);
-    GSIOrthoMapType.prototype.minZoom = 15;
-    GSIOrthoMapType.prototype.maxZoom = 17;
+    GSIOrthoMapType.prototype.minZoom = 4;
+    GSIOrthoMapType.prototype.maxZoom = 18;
     GSIOrthoMapType.prototype.name = 'GSI Ortho';
-    GSIOrthoMapType.prototype.alt = 'Chirin Map Ortho';
+    GSIOrthoMapType.prototype.alt = '地理院地図 Ortho';
 
     GSIOrthoMapType.prototype.getTile = function( tileXY, zoom, ownerDocument ) {
       var tileImage = ownerDocument.createElement('img');
@@ -29,10 +29,10 @@ jQuery(function ($) {
   function GSIOldStdMapType() {
 
     GSIOldStdMapType.prototype.tileSize = new google.maps.Size(256,256);
-    GSIOldStdMapType.prototype.minZoom = 15;
-    GSIOldStdMapType.prototype.maxZoom = 17;
+    GSIOldStdMapType.prototype.minZoom = 4;
+    GSIOldStdMapType.prototype.maxZoom = 18;
     GSIOldStdMapType.prototype.name = 'GSI Standard 2012';
-    GSIOldStdMapType.prototype.alt = 'Chiriin Standard 2012';
+    GSIOldStdMapType.prototype.alt = '地理院地図 Standard 2012';
 
     GSIOldStdMapType.prototype.getTile = function( tileXY, zoom, ownerDocument ) {
       var tileImage = ownerDocument.createElement('img');
@@ -53,10 +53,10 @@ jQuery(function ($) {
   function GSIStd2013OverlayedMapType() {
 
     GSIStd2013OverlayedMapType.prototype.tileSize = new google.maps.Size(256,256);
-    GSIStd2013OverlayedMapType.prototype.minZoom = 15;
-    GSIStd2013OverlayedMapType.prototype.maxZoom = 17;
-    GSIStd2013OverlayedMapType.prototype.name = 'GSI Std 2013 (Overlay)';
-    GSIStd2013OverlayedMapType.prototype.alt = 'Chiriin Map Standard 2013 (Overlay)';
+    GSIStd2013OverlayedMapType.prototype.minZoom = 4;
+    GSIStd2013OverlayedMapType.prototype.maxZoom = 18;
+    GSIStd2013OverlayedMapType.prototype.name = 'GSI Standard 2013';
+    GSIStd2013OverlayedMapType.prototype.alt = '地理院地図 Standard 2013';
 
     GSIStd2013OverlayedMapType.prototype.getTile = function( tileXY, zoom, ownerDocument ) {
       var tileImage = ownerDocument.createElement('img');
@@ -75,8 +75,8 @@ jQuery(function ($) {
     };
   }
 
-  function OverlayControl(map) {
-    // Denshi Kokudo LOGO 
+  function OverlayControl(map, overlayMap) {
+    // Denshi Kokudo LOGO
     denshiKokudoLOGO = document.createElement('div');
     denshiKokudoLOGO.innerHTML =
       "<a href='http://portal.cyberjapan.jp/' target='_blank'>" + 
@@ -107,19 +107,15 @@ jQuery(function ($) {
 
     map.controls[google.maps.ControlPosition.TOP_RIGHT].push( controlDiv );
 
-    var GSIStd2013Overlay = new GSIStd2013OverlayedMapType();
-
     // Setup "Overlay" control's click event listener
     google.maps.event.addDomListener( controlUI, 'click', function() {
       var currentMapTypeID = map.getMapTypeId();
       var overlayIndex = map.overlayMapTypes.getLength();
       if ( overlayIndex == 0 ) {
-        map.overlayMapTypes.push( GSIStd2013Overlay );
-//        denshiKokudoLOGO.style.display = "inline";
+        map.overlayMapTypes.push( overlayMap );
       }
       else {
         map.overlayMapTypes.pop();
-//        denshiKokudoLOGO.style.display = "none";
       }
       toggle_logo();
     });
@@ -127,15 +123,6 @@ jQuery(function ($) {
       $(denshiKokudoLOGO).toggle();
     }
   }
-
-
-  // var DenshiKokudoLOGO = null;
-  // var gMap;
-  // var zoomLevel = 16;
-  // var mapCenter = new google.maps.LatLng( 35.541896, 139.250157 );
-
-
-
 
   var map;
   var center = new google.maps.LatLng(35.00904999253169, 135.91976173437504);
@@ -161,7 +148,7 @@ jQuery(function ($) {
       ]
     }
   ];
-  var styledMap = new google.maps.StyledMapType(styles, {name: "Styled Map"});
+  var styledMap = new google.maps.StyledMapType(styles, {name: "Styled Google Map"});
   
   var mapOptions = {
     zoom: 12,
@@ -177,7 +164,13 @@ jQuery(function ($) {
     mapTypeId: google.maps.MapTypeId.ROADMAP,
     mapTypeControl: true,
     mapTypeControlOptions: {
-      mapTypeIds: [google.maps.MapTypeId.ROADMAP, 'map_style', 'GSI OldStd', 'GSI Ortho'],
+      mapTypeIds: [
+        google.maps.MapTypeId.ROADMAP, // 道路
+        google.maps.MapTypeId.SATELLITE, // 航空写真
+        google.maps.MapTypeId.HYBRID, // 航空写真＋主要道路
+        google.maps.MapTypeId.TERRAIN, // 地形
+        'map_style', 'GSI OldStd', 'GSI Ortho'
+      ],
       style: google.maps.MapTypeControlStyle.DROPDOWN_MENU
     }
   };
@@ -209,11 +202,12 @@ jQuery(function ($) {
 
   var GSIOrthoMap   = new GSIOrthoMapType();
   var GSIOldStdMap  = new GSIOldStdMapType();
+  var GSIStd2013Overlay = new GSIStd2013OverlayedMapType();
 
   map.mapTypes.set( 'GSI OldStd', GSIOldStdMap );
   map.mapTypes.set( 'GSI Ortho', GSIOrthoMap );
   
-  var overlayControl = new OverlayControl( map );
+  var overlayControl = new OverlayControl( map, GSIStd2013Overlay );
   
   google.maps.event.addListener( map, 'maptypeid_changed', function() {
     var currentMapTypeID = map.getMapTypeId();
@@ -223,6 +217,7 @@ jQuery(function ($) {
     } else {
       map.setOptions( {'streetViewControl': false} );
     }
+    
   });
   
   
