@@ -1,7 +1,31 @@
 // coding: utf-8
 jQuery(function ($) {
 // $(function() {
-    // GSI Map - Ortho
+  // OpenStreetMap
+  function OpenStreetMapType() {
+
+    OpenStreetMapType.prototype.tileSize = new google.maps.Size(256,256);
+    OpenStreetMapType.prototype.minZoom = 4;
+    OpenStreetMapType.prototype.maxZoom = 18;
+    OpenStreetMapType.prototype.name = 'OSM';
+    OpenStreetMapType.prototype.alt = 'OpenStreetMap';
+
+    OpenStreetMapType.prototype.getTile = function( tileXY, zoom, ownerDocument ) {
+      var tileImage = ownerDocument.createElement('img');
+      
+      var url= "http://tile.openstreetmap.org/" 
+          + zoom.toString() + "/" + tileXY.x.toString() + "/" 
+          + tileXY.y.toString() + ".png";
+
+      tileImage.src = url;
+      tileImage.style.width  = this.tileSize.width  + 'px';
+      tileImage.style.height = this.tileSize.height + 'px';
+
+      return tileImage;
+    };
+  }
+  
+  // GSI Map - Ortho
   function GSIOrthoMapType() {
 
     GSIOrthoMapType.prototype.tileSize = new google.maps.Size(256,256);
@@ -50,15 +74,15 @@ jQuery(function ($) {
   }
 
   // Chiriin Map Standard 2013 (Overlay)
-  function GSIStd2013OverlayedMapType() {
+  function GSIStd2013MapType() {
 
-    GSIStd2013OverlayedMapType.prototype.tileSize = new google.maps.Size(256,256);
-    GSIStd2013OverlayedMapType.prototype.minZoom = 4;
-    GSIStd2013OverlayedMapType.prototype.maxZoom = 18;
-    GSIStd2013OverlayedMapType.prototype.name = 'GSI Standard 2013';
-    GSIStd2013OverlayedMapType.prototype.alt = '地理院地図 Standard 2013';
+    GSIStd2013MapType.prototype.tileSize = new google.maps.Size(256,256);
+    GSIStd2013MapType.prototype.minZoom = 4;
+    GSIStd2013MapType.prototype.maxZoom = 18;
+    GSIStd2013MapType.prototype.name = 'GSI Standard 2013';
+    GSIStd2013MapType.prototype.alt = '地理院地図 Standard 2013';
 
-    GSIStd2013OverlayedMapType.prototype.getTile = function( tileXY, zoom, ownerDocument ) {
+    GSIStd2013MapType.prototype.getTile = function( tileXY, zoom, ownerDocument ) {
       var tileImage = ownerDocument.createElement('img');
 
       var url= "http://cyberjapandata.gsi.go.jp/xyz/std/" 
@@ -124,6 +148,29 @@ jQuery(function ($) {
     }
   }
 
+  function LatLngMarker(map, center) {
+    var marker = new google.maps.Marker({
+      position: center,
+      title: "緯度／軽度",
+      draggable: true // ドラッグ可能にする
+    });
+    marker.setMap(map);
+
+    var text_div = document.createElement('div');
+    text_div.style.fontFamily = 'Arial,sans-serif';
+    text_div.style.fontSize = '12px';
+    text_div.style.paddingLeft = '4px';
+    text_div.style.paddingRight = '4px';
+    text_div.innerHTML = '緯度：' + center.lat() + '／' + '緯度：' + center.lng();
+    map.controls[google.maps.ControlPosition.TOP_LEFT].push( text_div );
+
+    // マーカーのドロップ（ドラッグ終了）時のイベント
+    google.maps.event.addListener( marker, 'dragend', function(ev){
+      // イベントの引数evの、プロパティ.latLngが緯度経度。
+      text_div.innerHTML = '緯度：' + ev.latLng.lat() + '／' + '緯度：' + ev.latLng.lng();
+    });
+  }
+  
   var map;
   var center = new google.maps.LatLng(35.00904999253169, 135.91976173437504);
   // Create an array of styles.
@@ -169,9 +216,14 @@ jQuery(function ($) {
         google.maps.MapTypeId.SATELLITE, // 航空写真
         google.maps.MapTypeId.HYBRID, // 航空写真＋主要道路
         google.maps.MapTypeId.TERRAIN, // 地形
-        'map_style', 'GSI OldStd', 'GSI Ortho'
+        'map_style', // Google map カスタム
+        'OSM', // Open Street map
+        'GSI OldStd', // 地理院 2011
+        'GSI Ortho' // 地理院 航空
       ],
-      style: google.maps.MapTypeControlStyle.DROPDOWN_MENU
+      style: google.maps.MapTypeControlStyle.DROPDOWN_MENU,
+      // style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR, // google.maps.MapTypeControlStyle.DROPDOWN_MENU,
+      // position: google.maps.ControlPosition.TOP_RIGHT
     }
   };
   var map_canvas = document.getElementById('map-canvas');
@@ -182,6 +234,7 @@ jQuery(function ($) {
   map.mapTypes.set('map_style', styledMap);
   map.setMapTypeId('map_style');
 
+  var latlngMarker = new LatLngMarker(map, center);
   // 地図蔵版 http://japonyol.net/service-parking-area-michinoeki.html
   // var layer1 = new google.maps.FusionTablesLayer({
   //   query: {
@@ -200,14 +253,16 @@ jQuery(function ($) {
   });
   layer2.setMap(map);
 
+  var OpenStreetMap = new OpenStreetMapType();
   var GSIOrthoMap   = new GSIOrthoMapType();
   var GSIOldStdMap  = new GSIOldStdMapType();
-  var GSIStd2013Overlay = new GSIStd2013OverlayedMapType();
+  var GSIStd2013OMap = new GSIStd2013MapType(); // オーバーレイ用の地図
 
+  map.mapTypes.set( 'OSM', OpenStreetMap );
   map.mapTypes.set( 'GSI OldStd', GSIOldStdMap );
   map.mapTypes.set( 'GSI Ortho', GSIOrthoMap );
   
-  var overlayControl = new OverlayControl( map, GSIStd2013Overlay );
+  var overlayControl = new OverlayControl( map, GSIStd2013OMap );
   
   google.maps.event.addListener( map, 'maptypeid_changed', function() {
     var currentMapTypeID = map.getMapTypeId();
@@ -217,7 +272,6 @@ jQuery(function ($) {
     } else {
       map.setOptions( {'streetViewControl': false} );
     }
-    
   });
   
   
