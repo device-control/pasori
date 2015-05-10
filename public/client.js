@@ -152,6 +152,7 @@ jQuery(function ($) {
     var marker = new google.maps.Marker({
       position: center,
       title: "緯度／軽度",
+      icon: "http://www.google.com/mapfiles/gadget/arrowSmall80.png",
       draggable: true // ドラッグ可能にする
     });
     marker.setMap(map);
