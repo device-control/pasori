@@ -148,32 +148,105 @@ jQuery(function ($) {
     }
   }
 
-  function LatLngMarker(map, center) {
-    var marker = new google.maps.Marker({
-      position: center,
-      title: "緯度／軽度",
-      icon: "http://www.google.com/mapfiles/gadget/arrowSmall80.png",
-      draggable: true // ドラッグ可能にする
-    });
-    marker.setMap(map);
+//   function LatLngMarker(map, center) {
+//     var marker = new google.maps.Marker({
+//       position: center,
+//       title: "緯度／経度",
+//       icon: "http://www.google.com/mapfiles/gadget/arrowSmall80.png",
+//       draggable: true // ドラッグ可能にする
+//     });
+//     marker.setMap(map);
 
-    var text_div = document.createElement('div');
-    text_div.style.fontFamily = 'Arial,sans-serif';
-    text_div.style.fontSize = '12px';
-    text_div.style.paddingLeft = '4px';
-    text_div.style.paddingRight = '4px';
-    text_div.innerHTML = '緯度：' + center.lat() + '／' + '緯度：' + center.lng();
-    map.controls[google.maps.ControlPosition.TOP_LEFT].push( text_div );
+//     var text_div = document.createElement('div');
+//     text_div.style.fontFamily = 'Arial,sans-serif';
+//     text_div.style.fontSize = '12px';
+//     text_div.style.paddingLeft = '4px';
+//     text_div.style.paddingRight = '4px';
+//     text_div.innerHTML = '緯度：' + center.lat() + '／' + '経度：' + center.lng();
+//     map.controls[google.maps.ControlPosition.TOP_LEFT].push( text_div );
 
-    // マーカーのドロップ（ドラッグ終了）時のイベント
-    google.maps.event.addListener( marker, 'dragend', function(ev){
-      // イベントの引数evの、プロパティ.latLngが緯度経度。
-      text_div.innerHTML = '緯度：' + ev.latLng.lat() + '／' + '緯度：' + ev.latLng.lng();
-    });
-  }
+//     // マーカーのドロップ（ドラッグ終了）時のイベント
+//     google.maps.event.addListener( marker, 'dragend', function(ev){
+//       // イベントの引数evの、プロパティ.latLngが緯度経度。
+//       text_div.innerHTML = '緯度：' + ev.latLng.lat() + '／' + '経度：' + ev.latLng.lng();
+// //      map.controls[google.maps.ControlPosition.TOP_LEFT].push( text_div );
+//     });
+//   }
+
+
+  var LatLngMarker = (function() {
+    // constructor
+    var LatLngMarker = function(map, center) {
+      this.marker = new google.maps.Marker({
+        position: center,
+        title: "緯度／経度",
+        icon: "http://www.google.com/mapfiles/gadget/arrowSmall80.png",
+        draggable: true // ドラッグ可能にする
+      });
+      this.marker.setMap(map);
+      text_div = document.createElement('div');
+      text_div.style.fontFamily = 'Arial,sans-serif';
+      text_div.style.fontSize = '12px';
+      text_div.style.paddingLeft = '4px';
+      text_div.style.paddingRight = '4px';
+      text_div.innerHTML = '緯度：' + center.lat() + '／' + '経度：' + center.lng();
+      map.controls[google.maps.ControlPosition.TOP_LEFT].push( text_div );
+      
+      // マーカーのドロップ（ドラッグ終了）時のイベント
+      google.maps.event.addListener( this.marker, 'dragend', function(ev){
+        // イベントの引数evの、プロパティ.latLngが緯度経度。
+        text_div.innerHTML = '緯度：' + ev.latLng.lat() + '／' + '経度：' + ev.latLng.lng();
+        //      map.controls[google.maps.ControlPosition.TOP_LEFT].push( text_div );
+      });
+
+    };
+    var p = LatLngMarker.prototype;
+    
+    return LatLngMarker;
+  })();
+
+  infoWindow = new google.maps.InfoWindow();
   
+  // position = new google.maps.LatLng
+  var HistoryMarker = (function() {
+    // constructor
+    var HistoryMarker = function(map, position, title) {
+      this.marker = new google.maps.Marker({
+        position: position,
+        title: title,
+        icon: "http://labs.google.com/ridefinder/images/mm_20_blue.png",
+        draggable: false, // ドラッグ不可
+        animation: google.maps.Animation.DROP,
+      });
+      this.marker.setMap(map);
+      google.maps.event.addListener(this.marker, 'click', this.showTitle);
+
+      // function showTitle(event) {
+      //   var contentString = this.title;
+      //   // Replace the info window's content and position.
+      //   infoWindow.setContent(contentString);
+      //   infoWindow.setPosition(event.latLng);
+      //   infoWindow.open(map);
+      // }
+    };
+    
+    var p = HistoryMarker.prototype;
+    p.kill = function() {
+      this.marker.setMap(null);
+    };
+    p.showTitle = function(event) {
+      var contentString = this.title;
+      // Replace the info window's content and position.
+      infoWindow.setContent(contentString);
+      infoWindow.setPosition(event.latLng);
+      infoWindow.open(map);
+    };
+    
+    return HistoryMarker;
+  })();
+
   var map;
-  var center = new google.maps.LatLng(35.00904999253169, 135.91976173437504);
+  var center = new google.maps.LatLng(35.0390, 135.9210);
   // Create an array of styles.
   var styles = [
     {
@@ -235,6 +308,7 @@ jQuery(function ($) {
   map.mapTypes.set('map_style', styledMap);
   map.setMapTypeId('map_style');
 
+  var historyMarkers = new Array();
   var latlngMarker = new LatLngMarker(map, center);
   // 地図蔵版 http://japonyol.net/service-parking-area-michinoeki.html
   // var layer1 = new google.maps.FusionTablesLayer({
@@ -321,7 +395,6 @@ jQuery(function ($) {
     var index = 0;
     var max = history.length;
     for(index = 0; index < max; index++){
-      
       var line = '<th>' + history[index].ctype +'</th>';
       line += '<th>' + history[index].ctype_name +'</th>';
       line += '<th>' + history[index].proc + '</th>';
@@ -338,6 +411,14 @@ jQuery(function ($) {
       line += '<th>' + history[index].out_line + '</th>';
       line += '<th>' + history[index].out_sta + '</th>';
       $('table.history tbody').append('<tr>'+ line + '</tr>');
+
+      // position = new google.maps.LatLng
+      var marker = new HistoryMarker(map,
+                                     new google.maps.LatLng( history[index].drop_station_lat,
+                                                             history[index].drop_station_lng),
+                                     history[index].drop_station_name);
+      historyMarkers.push(marker);
+
     }
     
     // var message_li = document.createElement("li");
@@ -348,6 +429,11 @@ jQuery(function ($) {
   function clear(event){
     $('table.idm-ppm tbody *').remove();
     $('table.history tbody *').remove();
+
+    for (i in historyMarkers) {
+      historyMarkers[i].kill();
+    }
+    historyMarkers.length = 0;
   }
   
   // メッセージ送信時の処理

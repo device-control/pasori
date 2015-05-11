@@ -24,6 +24,9 @@ contents:
         in_sta: 101
         out_line: 200
         out_sta: 201
+        drop_station_name: "ポイント1"
+        drop_station_lat:  35.0100
+        drop_station_lng: 135.9100
       - ctype: 1
         ctype_name: "改札機"
         proc: 2
@@ -39,6 +42,9 @@ contents:
         in_sta: 101
         out_line: 200
         out_sta: 201
+        drop_station_name: "ポイント2"
+        drop_station_lat:  35.0200
+        drop_station_lng: 135.9000
       - ctype: 1
         ctype_name: "改札機"
         proc: 2
@@ -54,6 +60,9 @@ contents:
         in_sta: 101
         out_line: 200
         out_sta: 201
+        drop_station_name: "ポイント3"
+        drop_station_lat:  35.0300
+        drop_station_lng: 135.9000
       - ctype: 1
         ctype_name: "改札機"
         proc: 2
@@ -69,6 +78,9 @@ contents:
         in_sta: 101
         out_line: 200
         out_sta: 201
+        drop_station_name: "ポイント4"
+        drop_station_lat:  35.0400
+        drop_station_lng: 135.9000
       - ctype: 1
         ctype_name: "改札機"
         proc: 2
@@ -84,6 +96,9 @@ contents:
         in_sta: 101
         out_line: 200
         out_sta: 201
+        drop_station_name: "ポイント5"
+        drop_station_lat:  35.0500
+        drop_station_lng: 135.9000
       - ctype: 1
         ctype_name: "改札機"
         proc: 2
@@ -99,6 +114,9 @@ contents:
         in_sta: 101
         out_line: 200
         out_sta: 201
+        drop_station_name: "ポイント6"
+        drop_station_lat:  35.0600
+        drop_station_lng: 135.9000
       - ctype: 1
         ctype_name: "改札機"
         proc: 2
@@ -114,6 +132,9 @@ contents:
         in_sta: 101
         out_line: 200
         out_sta: 201
+        drop_station_name: "ポイント7"
+        drop_station_lat:  35.0700
+        drop_station_lng: 135.9000
       - ctype: 1
         ctype_name: "改札機"
         proc: 2
@@ -129,6 +150,9 @@ contents:
         in_sta: 101
         out_line: 200
         out_sta: 201
+        drop_station_name: "ポイント8"
+        drop_station_lat:  35.0800
+        drop_station_lng: 135.9000
       - ctype: 1
         ctype_name: "改札機"
         proc: 2
@@ -144,6 +168,9 @@ contents:
         in_sta: 101
         out_line: 200
         out_sta: 201
+        drop_station_name: "ポイント9"
+        drop_station_lat:  35.0900
+        drop_station_lng: 135.9000
       - ctype: 1
         ctype_name: "改札機"
         proc: 2
@@ -159,6 +186,9 @@ contents:
         in_sta: 101
         out_line: 200
         out_sta: 201
+        drop_station_name: "ポイント10"
+        drop_station_lat:  35.1000
+        drop_station_lng: 135.9000
       - ctype: 1
         ctype_name: "改札機"
         proc: 2
@@ -174,6 +204,9 @@ contents:
         in_sta: 101
         out_line: 200
         out_sta: 201
+        drop_station_name: "ポイント11"
+        drop_station_lat:  35.0100
+        drop_station_lng: 135.8600
       - ctype: 1
         ctype_name: "改札機"
         proc: 2
@@ -189,6 +222,9 @@ contents:
         in_sta: 101
         out_line: 200
         out_sta: 201
+        drop_station_name: "ポイント12"
+        drop_station_lat:  35.0200
+        drop_station_lng: 135.8600
       - ctype: 1
         ctype_name: "改札機"
         proc: 2
@@ -204,6 +240,9 @@ contents:
         in_sta: 101
         out_line: 200
         out_sta: 201
+        drop_station_name: "ポイント13"
+        drop_station_lat:  35.0300
+        drop_station_lng: 135.8600
       - ctype: 1
         ctype_name: "改札機"
         proc: 2
@@ -219,6 +258,9 @@ contents:
         in_sta: 101
         out_line: 200
         out_sta: 201
+        drop_station_name: "ポイント14"
+        drop_station_lat:  35.0400
+        drop_station_lng: 135.8600
       - ctype: 1
         ctype_name: "改札機"
         proc: 2
@@ -234,6 +276,9 @@ contents:
         in_sta: 101
         out_line: 200
         out_sta: 201
+        drop_station_name: "ポイント15"
+        drop_station_lat:  35.0500
+        drop_station_lng: 135.8600
       - ctype: 1
         ctype_name: "改札機"
         proc: 2
@@ -249,6 +294,9 @@ contents:
         in_sta: 101
         out_line: 200
         out_sta: 201
+        drop_station_name: "ポイント16"
+        drop_station_lat:  35.0600
+        drop_station_lng: 135.8600
       - ctype: 1
         ctype_name: "改札機"
         proc: 2
@@ -264,6 +312,9 @@ contents:
         in_sta: 101
         out_line: 200
         out_sta: 201
+        drop_station_name: "ポイント17"
+        drop_station_lat:  35.0700
+        drop_station_lng: 135.8600
       - ctype: 1
         ctype_name: "改札機"
         proc: 2
@@ -279,6 +330,9 @@ contents:
         in_sta: 101
         out_line: 200
         out_sta: 201
+        drop_station_name: "ポイント18"
+        drop_station_lat:  35.0800
+        drop_station_lng: 135.8600
       - ctype: 1
         ctype_name: "改札機"
         proc: 2
@@ -294,6 +348,9 @@ contents:
         in_sta: 101
         out_line: 200
         out_sta: 201
+        drop_station_name: "ポイント19"
+        drop_station_lat:  35.0900
+        drop_station_lng: 135.8600
       - ctype: 1
         ctype_name: "改札機"
         proc: 2
@@ -309,3 +366,6 @@ contents:
         in_sta: 101
         out_line: 200
         out_sta: 201
+        drop_station_name: "ポイント20"
+        drop_station_lat:  35.1000
+        drop_station_lng: 135.8600
