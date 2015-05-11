@@ -98,4 +98,13 @@ module PasoriAPI
     end
   end
   
+  def self.get_areacode(linecode, region)
+    # 線区が 0x7f 以下のとり : 0 (JR線)
+    return 0 if linecode < 0x7F
+    # 線区が 0x80 以上でリージョンが 0 のとき : 1 (関東公営・私鉄)
+    return 1 if region == 0
+    # 線区が 0x80 以上でリージョンが 1 のとき : 2 (関西公営・私鉄)
+    return 2
+  end
+  
 end

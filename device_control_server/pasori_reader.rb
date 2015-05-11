@@ -1,5 +1,6 @@
 # coding: utf-8
 require 'pasori_api'
+require 'station_info'
 
 class PasoriReader
   SERVICE_SUICA_HISTORY = 0x090f
@@ -7,6 +8,8 @@ class PasoriReader
   def initialize
     # ここで本当のデバイスの初期化や接続処理を行う
     @pasori_ptr = nil
+    
+    @station_info = StationInfo.new
   end
   
   def set_data(data)
@@ -94,7 +97,39 @@ class PasoriReader
       p[:out_sta] = da[9];
     end
   end
-
+  
+  # 駅情報取得
+  def get_station_info(p)
+    p[:in_company] = nil
+    p[:in_line_name] = nil
+    p[:in_station_name] = nil
+    p[:out_company] = nil
+    p[:out_line_name] = nil
+    p[:out_station_name] = nil
+    # in
+    if p[:in_line] && p[:in_sta]
+      areacode = PasoriAPI::get_areacode(p[:in_line], p[:region])
+      info = @station_info.code_to_info(areacode, p[:in_line], p[:in_sta])
+      if info
+        p[:in_company] = info[:company]
+        p[:in_line_name] = info[:line_name]
+        p[:in_station_name] = info[:station_name]
+      end
+    end
+    
+    # out
+    if p[:out_line] && p[:out_sta]
+      areacode = PasoriAPI::get_areacode(p[:out_line], p[:region])
+      info = @station_info.code_to_info(areacode, p[:out_line], p[:out_sta])
+      if info
+        p[:out_company] = info[:company]
+        p[:out_line_name] = info[:line_name]
+        p[:out_station_name] = info[:station_name]
+      end
+    end
+    
+  end
+  
   # 入出金履歴取得
   def pasori_history_read
     index = 0
@@ -120,6 +155,9 @@ class PasoriReader
       if !p[:time].nil?
         p[:time_string] = sprintf("%02d:%02d", (p[:time] >> 11), ((p[:time] >> 5) & 0x3f))
       end
+      
+      # 駅情報を取得
+      get_station_info(p)
       
       @history << p
       index += 1
