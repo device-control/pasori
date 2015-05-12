@@ -1,6 +1,7 @@
 # coding: utf-8
 require 'pasori_api'
 require 'station_info'
+require 'rail_data'
 
 class PasoriReader
   SERVICE_SUICA_HISTORY = 0x090f
@@ -10,6 +11,7 @@ class PasoriReader
     @pasori_ptr = nil
     
     @station_info = StationInfo.new
+    @rail_data = RailData.new
   end
   
   def set_data(data)
@@ -114,6 +116,11 @@ class PasoriReader
         p[:in_company] = info[:company]
         p[:in_line_name] = info[:line_name]
         p[:in_station_name] = info[:station_name]
+        
+        location = @rail_data.get_location(info[:company], info[:line_name], info[:station_name])
+        p[:drop_station_name] = info[:station_name]
+        p[:drop_station_lat] = location[:lat]
+        p[:drop_station_lng] = location[:lng]
       end
     end
     
