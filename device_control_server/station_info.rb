@@ -11,6 +11,12 @@ class StationInfo
   
   def initialize
     @station_info = nil
+    @data = nil
+    
+    load_yaml
+  end
+  
+  def load_yaml  
     # 駅コードファイルの読込
     filepath = File.expand_path(File.dirname(__FILE__)+"/../get_station_code/station_code.yml")
     if !File.exist?(filepath)
@@ -21,6 +27,10 @@ class StationInfo
       yaml = YAML.load(file.read)
       if target_data?(yaml)
         @station_info = yaml
+        contents = yaml[:contents]
+        if contents
+          @data = contents[:data]
+        end
       else
         puts "ERROR: station_code.ymlが対象のファイルではありません".encode('cp932')
       end
@@ -29,7 +39,7 @@ class StationInfo
   
   def code_to_info(area, line, sta)
     code = sprintf("%03d-%03d-%03d", area, line, sta)
-    @station_info[:contents][:data][code]
+    @data[code]
   rescue
     return nil
   end
