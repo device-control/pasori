@@ -395,7 +395,7 @@ jQuery(function ($) {
     var index = 0;
     var max = history.length;
     for(index = 0; index < max; index++){
-      var line = '<th>' + history[index].ctype +'</th>';
+      var line = '<th class=\"ctype\">' + history[index].ctype +'</th>';
       line += '<th>' + history[index].ctype_name +'</th>';
       line += '<th>' + history[index].proc + '</th>';
       line += '<th>' + history[index].proc_name + '</th>';
@@ -456,6 +456,12 @@ jQuery(function ($) {
       ws.close;
     }
   });
+
+    // 接続
+  $("table tbody").on('click', 'tr', function(){
+    alert("click");
+  });
+
   
   // クリア
   //document.getElementById("clear").onclick = function(){
