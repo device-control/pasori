@@ -310,23 +310,118 @@ jQuery(function ($) {
 
   var historyMarkers = new Array();
   var latlngMarker = new LatLngMarker(map, center);
+  
   // 地図蔵版 http://japonyol.net/service-parking-area-michinoeki.html
   // var layer1 = new google.maps.FusionTablesLayer({
   //   query: {
   //     from: '186Nsf4x8WFwX8o7harkF6B7ROwKtOGwbZ3ktsMqZ'
   //   },
   // });
-  // layer1.setMap(map);
+  //layer1.setMap(map);
   
   // Let's play with Google Maps Fusion-Table版(国土 http://www15.plala.or.jp/gonkunkan/main6.html
   var layer2 = new google.maps.FusionTablesLayer({
     query: {
-      // qselect: "col2\x3e\x3e1",
-      from: "1ZMrQjtiPTeGowOm2umjdUAP9993pk0Gypst2SJY",
-      // where: ""
+      select: 'geometry',
+      from: "1oVouXsjBueThIMExCZh9LhYNVINnqIjzrnuc1fIT",
+      // where: "name CONTAINS '線'", // "線"を含むもののみ
+      // where: "data_type = 'rail'", // 路線だけ
+      // where: "data_type = 'station'", // 駅だけ
     },
+    styles: [{
+      where: "service_provider_type = '1'",
+      polylineOptions: {
+        strokeColor: "#0000ff",
+        strokeOpacity: 1.0,
+        // strokeWeight: "2" 
+        zIndex: 1,
+      },
+      markerOptions: {
+        iconName: 'small_blue',
+        zIndex: 2,
+      }
+    },{
+      where: "service_provider_type = '2'",
+      polylineOptions: {
+        strokeColor: "#00ff00",
+        strokeOpacity: 1.0,
+        // strokeWeight: "2" 
+        zIndex: 1,
+      },
+      markerOptions: {
+        iconName: 'small_green',
+        zIndex: 2,
+      }
+    },{
+      where: "service_provider_type = '3'",
+      polylineOptions: {
+        strokeColor: "#ff0000",
+        strokeOpacity: 1.0,
+        // strokeWeight: "2" 
+        zIndex: 1,
+      },
+      markerOptions: {
+        iconName: 'small_red',
+        zIndex: 2,
+      }
+    },{
+      where: "service_provider_type = '4'",
+      polylineOptions: {
+        strokeColor: "#ff00ff",
+        strokeOpacity: 1.0,
+        // strokeWeight: "2" 
+        zIndex: 1,
+      },
+      markerOptions: {
+        iconName: 'small_purple',
+        zIndex: 2,
+      }
+    },{
+      where: "service_provider_type = '5'",
+      polylineOptions: {
+        strokeColor: "#ffff00",
+        strokeOpacity: 1.0,
+        // strokeWeight: "2"
+        zIndex: 1,
+      },
+      markerOptions: {
+        iconName: 'small_yellow',
+        zIndex: 2,
+      }
+    }]
   });
   layer2.setMap(map);
+  google.maps.event.addListener(layer2, 'click', function(e) {
+    // Change the content of the InfoWindow
+    e.infoWindowHtml =
+      '事業者：' + e.row['company_name'].value + "<br>" +
+      '路線：' + e.row['line_name'].value;
+    if( e.row['data_type'].value == 'station') {
+      e.infoWindowHtml += '<br>駅名：' + e.row['station_name'].value;
+    }
+  });
+  
+
+  //
+  // Google Maps APIの「お天気＆雲レイヤ」と「Panoramioレイヤ」は2015年に廃止されるそうです。
+  //  http://shimz.me/blog/google-map-api/3556
+  // 天気情報をだしたいなら「Leaflet.jsで作成した地図上にお天気情報をオーバーレイする」を参考になるかも
+  //  http://shimz.me/blog/map/3671
+  // そもそも地図を表示する方法としてはgoogle map apiを利用しなくても"OpenLayers"や"Leaflet" js library を利用して表示できる。
+  // 参考サイトは「地理院地図の地図タイルを使ったD3.js&Cesiumサンプル」がいいかもしれない
+  //  http://shimz.me/blog/d3-js/3134
+  //
+  
+  // 天気／雲レイヤを表示させたい場合、以下のように&libraries=weatherを指定する必要がある
+  //  <script src="http://maps.googleapis.com/maps/api/js?sensor=false&region=JP&libraries=weather"></script>
+  //
+  // // 天気レイヤ追加
+  // var weatherLayer = new google.maps.weather.WeatherLayer(); 
+  // weatherLayer.setMap(map);
+  
+  // //雲レイヤ追加
+  // var cloudLayer = new google.maps.weather.CloudLayer(); 
+  // cloudLayer.setMap(map);
 
   var OpenStreetMap = new OpenStreetMapType();
   var GSIOrthoMap   = new GSIOrthoMapType();
