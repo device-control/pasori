@@ -148,32 +148,194 @@ jQuery(function ($) {
     }
   }
 
-  function LatLngMarker(map, center) {
-    var marker = new google.maps.Marker({
-      position: center,
-      title: "緯度／軽度",
-      icon: "http://www.google.com/mapfiles/gadget/arrowSmall80.png",
-      draggable: true // ドラッグ可能にする
-    });
-    marker.setMap(map);
+  var LatLngMarker = (function() {
+    // constructor
+    var LatLngMarker = function(map, center) {
+      this.marker = new google.maps.Marker({
+        position: center,
+        title: "緯度／経度",
+        icon: "http://www.google.com/mapfiles/gadget/arrowSmall80.png",
+        draggable: true // ドラッグ可能にする
+      });
+      this.marker.setMap(map);
+      text_div = document.createElement('div');
+      text_div.style.fontFamily = 'Arial,sans-serif';
+      text_div.style.fontSize = '12px';
+      text_div.style.paddingLeft = '4px';
+      text_div.style.paddingRight = '4px';
+      text_div.innerHTML = '緯度：' + center.lat() + '／' + '経度：' + center.lng();
+      map.controls[google.maps.ControlPosition.TOP_LEFT].push( text_div );
+      
+      // マーカーのドロップ（ドラッグ終了）時のイベント
+      google.maps.event.addListener( this.marker, 'dragend', function(ev){
+        // イベントの引数evの、プロパティ.latLngが緯度経度。
+        text_div.innerHTML = '緯度：' + ev.latLng.lat() + '／' + '経度：' + ev.latLng.lng();
+        //      map.controls[google.maps.ControlPosition.TOP_LEFT].push( text_div );
+      });
 
-    var text_div = document.createElement('div');
-    text_div.style.fontFamily = 'Arial,sans-serif';
-    text_div.style.fontSize = '12px';
-    text_div.style.paddingLeft = '4px';
-    text_div.style.paddingRight = '4px';
-    text_div.innerHTML = '緯度：' + center.lat() + '／' + '緯度：' + center.lng();
-    map.controls[google.maps.ControlPosition.TOP_LEFT].push( text_div );
+    };
+    var p = LatLngMarker.prototype;
+    
+    return LatLngMarker;
+  })();
 
-    // マーカーのドロップ（ドラッグ終了）時のイベント
-    google.maps.event.addListener( marker, 'dragend', function(ev){
-      // イベントの引数evの、プロパティ.latLngが緯度経度。
-      text_div.innerHTML = '緯度：' + ev.latLng.lat() + '／' + '緯度：' + ev.latLng.lng();
-    });
-  }
-  
+  var HistoryMarkerArray = (function() {
+    // constructor
+    var HistoryMarkerArray = function(option) {
+      this.markers = new Array();
+    };
+    
+    var p = HistoryMarkerArray.prototype;
+    p.addMarker = function(option) {
+      var marker = null;
+      // 経度、緯度が一致するMarkerが既に存在するかチェックする
+      for(var i = 0; i < this.markers.length; i++){
+        if( this.markers[i].isSamePosition(option.lat, option.lng) ) {
+          marker = this.markers[i];
+          break;
+        };
+      };
+      // marker情報がなければ、追加する
+      if (marker == null) {
+        marker = new HistoryMarker(option);
+        this.markers.push(marker);
+      } else {
+        // 履歴情報を追加する
+        marker.addInfo(option.info);
+      }
+    };
+    p.getMarkerIndex = function(lat, lng) {
+      var index = null;
+      for(var i = 0; i < this.markers.length; i++){
+        if ( this.markers[i].isSamePosition(lat, lng) ) {
+          index = i;
+        }
+      }
+      return index;
+    };
+    p.getBounds = function() {
+      var bounds = new google.maps.LatLngBounds();
+      for(var i = 0; i < this.markers.length; i++){
+        bounds.extend( this.markers[i].latLng );
+      }
+      return bounds;
+    };
+    p.show = function() {
+      len = this.markers.length;
+      for(var i = 0; i < len; i++){
+        setTimeout(function( marker ) {
+          marker.drop();
+        }, i * 1000/len, this.markers[i] );
+      }
+    };
+    p.clear = function() {
+      for(var i = 0; i < this.markers.length; i++){
+        this.markers[i].kill();
+      }
+      this.markers.length = 0;
+    };
+    p.stop = function() {
+      for(var i = 0; i < this.markers.length; i++){
+        this.markers[i].stop();
+      }
+    };
+    p.animation = function() {
+      for(var i = 0; i < this.markers.length; i++){
+        this.markers[i].animation();
+      }
+    };
+    
+    return HistoryMarkerArray;
+  })();
+
+  var HistoryMarker = (function() {
+    // constructor
+    var HistoryMarker = function(option) {
+      this.map = option.map;
+      this.latLng = new google.maps.LatLng(option.lat, option.lng);
+      this.stationName = option.stationName;
+      this.title = option.title;
+      this.infos = new Array();
+      this.infos.push(option.info);
+      this.is_bounce = false;
+      
+      this.marker = new google.maps.Marker({
+        position: this.latLng,
+        title: this.title,
+        icon: "http://labs.google.com/ridefinder/images/mm_20_blue.png",
+        draggable: false, // ドラッグ不可
+        animation: google.maps.Animation.DROP,
+      });
+      // 吹き出しを生成する
+      this.infoWindow = new google.maps.InfoWindow();
+      this.infoWindow.setPosition(this.latLng);
+      var content = this.getInfoWindowContents();
+      this.infoWindow.setContent(content);
+      google.maps.event.addListener(this.marker, 'click', this.showTitle.bind(this));
+      google.maps.event.addListener(this.marker, 'animation_changed', this.animation.bind(this));
+    };
+    
+    var p = HistoryMarker.prototype;
+    p.drop = function() {
+      this.marker.setMap(this.map);
+      // this.infoWindow.open(this.map, this.marker);
+    };
+    p.kill = function() {
+      this.map = null;
+      this.marker.setMap(null);
+    };
+    p.showTitle = function(event) {
+      this.infoWindow.setZIndex(0);
+      this.infoWindow.open(this.map, this.marker);
+    };
+    p.animation = function(event) {
+      if ( this.is_bounce ) {
+        if ( this.marker.getAnimation() == null ) {
+          this.marker.setAnimation(google.maps.Animation.BOUNCE);
+        }
+      } else {
+        if ( this.marker.getAnimation() != null ) {
+          this.marker.setAnimation(null);
+        }
+      }
+    };
+    p.bounce = function() {
+      this.is_bounce = true;
+    };
+    p.stop = function() {
+      this.is_bounce = false;
+    };
+    p.addInfo = function(info) {
+      this.infos.push(info);
+      var content = this.getInfoWindowContents();
+      this.infoWindow.setContent(content);
+    };
+    p.isSamePosition = function(lat, lng) {
+      var latlng = new google.maps.LatLng(lat, lng);
+      if ( latlng.lat() === this.latLng.lat() && latlng.lng() === this.latLng.lng() ) {
+        return true;
+      }
+      return false;
+    };
+    p.getInfoWindowContents = function() {
+        var content = "";
+        content += '<div class="info_window">';
+        content += '<table style="font-size:xx-small;">';
+        content += '<tbody>';
+        for(var i = 0; i < this.infos.length; i++){
+            content += this.infos[i];
+        }
+        content += '</tbody>';
+        content += '</table>';
+        content += '</div>';
+        return content;
+    };
+    
+    return HistoryMarker;
+  })();
+
   var map;
-  var center = new google.maps.LatLng(35.00904999253169, 135.91976173437504);
+  var center = new google.maps.LatLng(35.0390, 135.9210);
   // Create an array of styles.
   var styles = [
     {
@@ -235,24 +397,102 @@ jQuery(function ($) {
   map.mapTypes.set('map_style', styledMap);
   map.setMapTypeId('map_style');
 
+  var historyMarkers = new HistoryMarkerArray();
   var latlngMarker = new LatLngMarker(map, center);
-  // 地図蔵版 http://japonyol.net/service-parking-area-michinoeki.html
-  // var layer1 = new google.maps.FusionTablesLayer({
-  //   query: {
-  //     from: '186Nsf4x8WFwX8o7harkF6B7ROwKtOGwbZ3ktsMqZ'
-  //   },
-  // });
-  // layer1.setMap(map);
-  
-  // Let's play with Google Maps Fusion-Table版(国土 http://www15.plala.or.jp/gonkunkan/main6.html
+
   var layer2 = new google.maps.FusionTablesLayer({
     query: {
-      // qselect: "col2\x3e\x3e1",
-      from: "1ZMrQjtiPTeGowOm2umjdUAP9993pk0Gypst2SJY",
-      // where: ""
+      select: 'geometry',
+      from: "1oVouXsjBueThIMExCZh9LhYNVINnqIjzrnuc1fIT",
+      // where: "name CONTAINS '線'", // "線"を含むもののみ
+      // where: "data_type = 'rail'", // 路線だけ
+      // where: "data_type = 'station'", // 駅だけ
     },
+    styles: [{
+      where: "service_provider_type = '1'",
+      polylineOptions: {
+        strokeColor: "#0000ff",
+        strokeOpacity: 1.0,
+        // strokeWeight: "2" 
+        zIndex: 1,
+      },
+      markerOptions: {
+        iconName: 'small_blue',
+        zIndex: 2,
+      }
+    },{
+      where: "service_provider_type = '2'",
+      polylineOptions: {
+        strokeColor: "#00ff00",
+        strokeOpacity: 1.0,
+        // strokeWeight: "2" 
+        zIndex: 1,
+      },
+      markerOptions: {
+        iconName: 'small_green',
+        zIndex: 2,
+      }
+    },{
+      where: "service_provider_type = '3'",
+      polylineOptions: {
+        strokeColor: "#ff0000",
+        strokeOpacity: 1.0,
+        // strokeWeight: "2" 
+        zIndex: 1,
+      },
+      markerOptions: {
+        iconName: 'small_red',
+        zIndex: 2,
+      }
+    },{
+      where: "service_provider_type = '4'",
+      polylineOptions: {
+        strokeColor: "#ff00ff",
+        strokeOpacity: 1.0,
+        // strokeWeight: "2" 
+        zIndex: 1,
+      },
+      markerOptions: {
+        iconName: 'small_purple',
+        zIndex: 2,
+      }
+    },{
+      where: "service_provider_type = '5'",
+      polylineOptions: {
+        strokeColor: "#ffff00",
+        strokeOpacity: 1.0,
+        // strokeWeight: "2"
+        zIndex: 1,
+      },
+      markerOptions: {
+        iconName: 'small_yellow',
+        zIndex: 2,
+      }
+    }]
   });
   layer2.setMap(map);
+
+
+  //
+  // Google Maps APIの「お天気＆雲レイヤ」と「Panoramioレイヤ」は2015年に廃止されるそうです。
+  //  http://shimz.me/blog/google-map-api/3556
+  // 天気情報をだしたいなら「Leaflet.jsで作成した地図上にお天気情報をオーバーレイする」を参考になるかも
+  //  http://shimz.me/blog/map/3671
+  // そもそも地図を表示する方法としてはgoogle map apiを利用しなくても"OpenLayers"や"Leaflet" js library を利用して表示できる。
+  // 参考サイトは「地理院地図の地図タイルを使ったD3.js&Cesiumサンプル」がいいかもしれない
+  //  http://shimz.me/blog/d3-js/3134
+  //
+  
+  // 天気／雲レイヤを表示させたい場合、以下のように&libraries=weatherを指定する必要がある
+  //  <script src="http://maps.googleapis.com/maps/api/js?sensor=false&region=JP&libraries=weather"></script>
+  //
+  // // 天気レイヤ追加
+  // var weatherLayer = new google.maps.weather.WeatherLayer(); 
+  // weatherLayer.setMap(map);
+  
+  // //雲レイヤ追加
+  // var cloudLayer = new google.maps.weather.CloudLayer(); 
+  // cloudLayer.setMap(map);
 
   var OpenStreetMap = new OpenStreetMapType();
   var GSIOrthoMap   = new GSIOrthoMapType();
@@ -316,38 +556,81 @@ jQuery(function ($) {
     var json = JSON.parse(event.data);
     var contents = json.contents;
     var history = contents.pasori_data.history;
+    
+    // カード情報
     $('table.idm-ppm tbody').append('<th>' + contents.pasori_data.idm +'</th>');
     $('table.idm-ppm tbody').append('<th>' + contents.pasori_data.pmm +'</th>');
-    var index = 0;
-    var max = history.length;
-    for(index = 0; index < max; index++){
+    
+    // 履歴情報
+    for(var index = 0; index < history.length; index++){
+      var h = history[index];
+      var in_marker_index = null;
+      var out_marker_index = null;
       
-      var line = '<th>' + history[index].ctype +'</th>';
-      line += '<th>' + history[index].ctype_name +'</th>';
-      line += '<th>' + history[index].proc + '</th>';
-      line += '<th>' + history[index].proc_name + '</th>';
-      line += '<th>' + history[index].date + '</th>';
-      line += '<th>' + history[index].date_string + '</th>';
-      line += '<th>' + history[index].time + '</th>';
-      line += '<th>' + history[index].time_string + '</th>';
-      line += '<th>' + history[index].balance + '</th>';
-      line += '<th>' + history[index].region + '</th>';
-      line += '<th>' + history[index].seq + '</th>';
-      line += '<th>' + history[index].in_line + '</th>';
-      line += '<th>' + history[index].in_sta + '</th>';
-      line += '<th>' + history[index].out_line + '</th>';
-      line += '<th>' + history[index].out_sta + '</th>';
+      // 地図表示の情報
+      // 入場駅の情報
+      if (h.in_station_location != null) {
+        var option = {};
+        option.map = map;
+        option.lat = h.in_station_location.lat;
+        option.lng = h.in_station_location.lng;
+        option.stn = h.in_station_name;
+        option.title = h.in_company_name + "：" + h.in_station_name;
+        option.info = makeMarkerInfo( h.date_string, h.proc_name, "入場駅" );
+        historyMarkers.addMarker(option);
+        in_marker_index = historyMarkers.getMarkerIndex( option.lat, option.lng );
+      }
+      // 出場駅の情報
+      if (h.out_station_location != null) {
+        var option = {};
+        option.map = map;
+        option.lat = h.out_station_location.lat;
+        option.lng = h.out_station_location.lng;
+        option.stn = h.out_station_name;
+        option.title = h.out_company_name + "：" + h.out_station_name;
+        option.info = makeMarkerInfo( h.date_string, h.proc_name, "出場駅" );
+        historyMarkers.addMarker(option);
+        out_marker_index = historyMarkers.getMarkerIndex( option.lat, option.lng );
+        
+      }
+      
+      // リスト表示の情報
+      var line = '';
+      line += '<th class="date_string">' + h.date_string +'</th>';
+      line += '<th>' + h.ctype_name +'</th>';
+      line += '<th>' + h.proc_name +'</th>';
+      line += '<th class="in_station_name" data-marker='+ in_marker_index + '>' + h.in_station_name +'</th>';
+      line += '<th class="out_station_name" data-marker='+ out_marker_index + '>' + h.out_station_name +'</th>';
+      line += '<th>' + h.balance_string +'</th>';
       $('table.history tbody').append('<tr>'+ line + '</tr>');
+      
     }
     
-    // var message_li = document.createElement("li");
-    // message_li.textContent = event.data;
-    // document.getElementById("message_area").appendChild(message_li);
+    // mapの表示範囲をmarkerすべてが表示できるように変更する
+    if ( historyMarkers.markers.length ) {
+      map.fitBounds( historyMarkers.getBounds() );
+    }
+    
+    // Markerを表示する
+    historyMarkers.show();
+    
   }
-  
+
+  function makeMarkerInfo( date, proc, inOut ) {
+    var info = "";
+    info += '<tr>';
+    info += '<td>' + date +'</td>';
+    info += '<td>' + proc +'</td>';
+    info += '<td>' + inOut + '</td>';
+    info += '</tr>';
+    return info;
+  }
+
   function clear(event){
     $('table.idm-ppm tbody *').remove();
     $('table.history tbody *').remove();
+    
+    historyMarkers.clear();
   }
   
   // メッセージ送信時の処理
@@ -380,5 +663,67 @@ jQuery(function ($) {
   });
   
   // $(open);
+  
+  // 日付
+  $("table.history").on('click', '.date_string', function(event){
+    var line = $(event.target.closest("tr"));
+    var in_index = line.find(".in_station_name").data().marker;
+    if ( in_index === 'null' ) { in_index = null };
+    var out_index = line.find(".out_station_name").data().marker;
+    if ( out_index === 'null' ) { out_index = null };
+    
+    historyMarkers.stop();
+    
+    if ( in_index != null || out_index != null ) {
+      var bounds = new google.maps.LatLngBounds();
+      
+      if ( in_index != null) {
+        var marker = historyMarkers.markers[in_index];
+        bounds.extend( marker.latLng );
+        marker.bounce();
+      }
+      if ( out_index != null) {
+        var marker = historyMarkers.markers[out_index];
+        bounds.extend( marker.latLng );
+        marker.bounce();
+      }
+      map.panToBounds(bounds);
+    }
+    
+    historyMarkers.animation();
+  });
+  
+  // 入場駅
+  $("table.history").on('click', '.in_station_name', function(event){
+    var index = event.target.dataset.marker;
+    if ( index === 'null' ) { index = null };
+    
+    historyMarkers.stop();
+    
+    if ( index != null ) {
+      var marker = historyMarkers.markers[index];
+      map.panTo( marker.latLng );
+      marker.bounce();
+    }
+    
+    historyMarkers.animation();
+  });
+  
+  // 出場駅
+  $("table.history").on('click', '.out_station_name', function(event){
+    var index = event.target.dataset.marker;
+    if ( index === 'null' ) { index = null };
+    
+    historyMarkers.stop();
+    
+    if ( index != null ) {
+      var marker = historyMarkers.markers[index];
+      map.panTo( marker.latLng );
+      marker.bounce();
+    }
+    
+    historyMarkers.animation();
+  });
+  
 });
 

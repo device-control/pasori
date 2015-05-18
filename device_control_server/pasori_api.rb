@@ -50,52 +50,91 @@ module PasoriAPI
   extern 'felica* felica_enum_systemcode(pasori *)' # システムコードの列挙
   extern 'felica* felica_enum_service(pasori *, uint16)' # サービス/エリアコードの列挙
   
-  def self.n2hs(value)
-    ( ((value & 0xff) << 8) | ((value & 0xff00) >> 8) )
-  end
-  
-  def self.get2byte(da,offset)
-    return (da[offset] << 8) | da[offset+1]
-  end
-  
-  def self.get4byte(da,offset)
-    return (da[offset] << 24) |(da[offset+1] << 16) |(da[offset+2] << 8) | da[offset+3]
-  end
-  
-  def self.get_console_type(ctype)
-    case ctype
-    when 0x03; "清算機"
-    when 0x05; "車載端末"
-    when 0x08; "券売機"
-    when 0x12; "券売機"
-    when 0x16; "改札機"
-    when 0x17; "簡易改札機"
-    when 0x18; "窓口端末"
-    when 0x1a; "改札端末"
-    when 0x1b; "携帯電話"
-    when 0x1c; "乗継清算機"
-    when 0x1d; "連絡改札機"
-    when 0xc7; "物販"
-    when 0xc8; "自販機"
-    else "???"
+  class << self
+    def n2hs(value)
+      ( ((value & 0xff) << 8) | ((value & 0xff00) >> 8) )
     end
-  end
-  
-  def self.get_proc_type(proc)
-    case proc
-    when 0x01; "運賃支払"
-    when 0x02; "チャージ"
-    when 0x03; "券購"
-    when 0x04; "清算"
-    when 0x07; "新規"
-    when 0x0d; "バス"
-    when 0x0f; "バス"
-    when 0x14; "オートチャージ"
-    when 0x46; "物販"
-    when 0x49; "入金"
-    when 0xc6; "物販(現金併用)"
-    else "???"
+    
+    def get2byte(da,offset)
+      return (da[offset] << 8) | da[offset+1]
     end
+    
+    def get3byte(da,offset)
+      return (da[offset] << 16) |(da[offset+1] << 8) | da[offset+2]
+    end
+    
+    def get4byte(da,offset)
+      return (da[offset] << 24) |(da[offset+1] << 16) |(da[offset+2] << 8) | da[offset+3]
+    end
+    
+    def get_console_type(ctype)
+      case ctype
+      when 3; "精算機"
+      when 4; "携帯型端末"
+      when 5; "車載端末"
+      when 7; "券売機"
+      when 8; "券売機"
+      when 9; "入金機"
+      when 18; "券売機"
+      when 20; "券売機等"
+      when 21; "券売機等"
+      when 22; "改札機"
+      when 23; "簡易改札機"
+      when 24; "窓口端末"
+      when 24; "窓口端末"
+      when 26; "改札端末"
+      when 27; "携帯電話"
+      when 28; "乗継精算機"
+      when 29; "連絡改札機"
+      when 31; "簡易入金機"
+      when 70; "VIEW ALTTE"
+      when 72; "VIEW ALTTE"
+      when 199; "物販端末"
+      when 200; "自販機"
+      else "???"
+      end
+    end
+    
+    def get_proc_type(proc)
+      case proc
+      when 1; "運賃支払(改札出場)"
+      when 2; "チャージ"
+      when 3; "券購(磁気券購入)"
+      when 4; "精算"
+      when 5; "精算 (入場精算)"
+      when 6; "窓出 (改札窓口処理)"
+      when 7; "新規 (新規発行)"
+      when 8; "控除 (窓口控除)"
+      when 13; "バス (PiTaPa系)"
+      when 15; "バス (IruCa系)"
+      when 17; "再発 (再発行処理)"
+      when 19; "支払 (新幹線利用)"
+      when 20; "入A (入場時オートチャージ)"
+      when 21; "出A (出場時オートチャージ)"
+      when 31; "入金 (バスチャージ)"
+      when 35; "券購 (バス路面電車企画券購入)"
+      when 70; "物販"
+      when 72; "特典 (特典チャージ)"
+      when 73; "入金 (レジ入金)"
+      when 74; "物販取消"
+      when 75; "入物 (入場物販)"
+      when 198; "物現 (現金併用物販)"
+      when 203; "入物 (入場現金併用物販)"
+      when 132; "精算 (他社精算)"
+      when 133; "精算 (他社入場精算)"
+      else "???"
+      end
+    end
+    
+    def get_areacode(linecode, region)
+      # 線区が 0x7f 以下のとり : 0 (JR線)
+      return 0 if linecode < 0x7F
+      # 線区が 0x80 以上でリージョンが 0 のとき : 1 (関東公営・私鉄)
+      return 1 if region == 0
+      # 線区が 0x80 以上でリージョンが 1 のとき : 2 (関西公営・私鉄)
+      return 2
+    end
+    
   end
   
 end
