@@ -555,39 +555,39 @@ jQuery(function ($) {
     console.log("メッセージ受信");
     var json = JSON.parse(event.data);
     var contents = json.contents;
-    var history = contents.pasori_data.history;
+    var histories = contents.pasori_data.histories;
     
     // カード情報
     $('table.idm-ppm tbody').append('<th>' + contents.pasori_data.idm +'</th>');
     $('table.idm-ppm tbody').append('<th>' + contents.pasori_data.pmm +'</th>');
     
     // 履歴情報
-    for(var index = 0; index < history.length; index++){
-      var h = history[index];
+    for(var index = 0; index < histories.length; index++){
+      var h = histories[index];
       var in_marker_index = null;
       var out_marker_index = null;
       
       // 地図表示の情報
       // 入場駅の情報
-      if (h.in_station_location != null) {
+      if (h.in_station_location != null && h.in_station_info != null) {
         var option = {};
         option.map = map;
         option.lat = h.in_station_location.lat;
         option.lng = h.in_station_location.lng;
-        option.stn = h.in_station_name;
-        option.title = h.in_company_name + "：" + h.in_station_name;
+        option.stn = h.in_station_info.station_name;
+        option.title = h.in_station_info.company + "：" + h.in_station_info.station_name;
         option.info = makeMarkerInfo( h.date_string, h.proc_name, "入場駅" );
         historyMarkers.addMarker(option);
         in_marker_index = historyMarkers.getMarkerIndex( option.lat, option.lng );
       }
       // 出場駅の情報
-      if (h.out_station_location != null) {
+      if (h.out_station_location != null && h.out_station_info != null) {
         var option = {};
         option.map = map;
         option.lat = h.out_station_location.lat;
         option.lng = h.out_station_location.lng;
-        option.stn = h.out_station_name;
-        option.title = h.out_company_name + "：" + h.out_station_name;
+        option.stn = h.out_station_info.station_name;
+        option.title = h.out_station_info.company + "：" + h.out_station_info.station_name;
         option.info = makeMarkerInfo( h.date_string, h.proc_name, "出場駅" );
         historyMarkers.addMarker(option);
         out_marker_index = historyMarkers.getMarkerIndex( option.lat, option.lng );
@@ -599,8 +599,17 @@ jQuery(function ($) {
       line += '<th class="date_string">' + h.date_string +'</th>';
       line += '<th>' + h.ctype_name +'</th>';
       line += '<th>' + h.proc_name +'</th>';
-      line += '<th class="in_station_name" data-marker='+ in_marker_index + '>' + h.in_station_name +'</th>';
-      line += '<th class="out_station_name" data-marker='+ out_marker_index + '>' + h.out_station_name +'</th>';
+      var in_station_name = null;
+      if (h.in_station_info != null) {
+        in_station_name = h.in_station_info.station_name;
+      }
+      line += '<th class="in_station_name" data-marker='+ in_marker_index + '>' + in_station_name +'</th>';
+      var out_station_name = null;
+      if (h.out_station_info != null) {
+        out_station_name = h.out_station_info.station_name;
+      }
+      line += '<th class="out_station_name" data-marker='+ out_marker_index + '>' + out_station_name +'</th>';
+
       line += '<th>' + h.balance_string +'</th>';
       $('table.history tbody').append('<tr>'+ line + '</tr>');
       

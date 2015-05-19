@@ -1,10 +1,16 @@
 # coding: utf-8
 $LOAD_PATH.unshift(File.expand_path(File.dirname(__FILE__)))
 
+require 'singleton'
 require 'yaml'
 require 'pry'
 
+Encoding.default_external = 'utf-8'
+Encoding.default_internal = 'utf-8'
+
 class StationInfo
+  include Singleton
+  
   # 対象ファイルの定義
   CONTENT_TYPE    = "station_code"
   CONTENT_VERSION = "0.1"
