@@ -1,6 +1,11 @@
 # coding: utf-8
+$LOAD_PATH.unshift(File.expand_path(File.dirname(__FILE__)))
+
 require 'fiddle/import'
 require 'fiddle/types'
+
+Encoding.default_external = 'utf-8'
+Encoding.default_internal = 'utf-8'
 
 module PasoriAPI
   extend Fiddle::Importer
@@ -23,19 +28,19 @@ module PasoriAPI
   typealias 'MAX_SERVICE_CODE', MAX_SERVICE_CODE
   
   Felica = struct( [
-      "pasori *p", # PaSoRi ハンドル
-      "uint16 systemcode", # システムコード
-      "uint8 IDm[8]", # IDm
-      "uint8 PMm[8]", # PMm
+      'pasori *p', # PaSoRi ハンドル
+      'uint16 systemcode', # システムコード
+      'uint8 IDm[8]', # IDm
+      'uint8 PMm[8]', # PMm
       # systemcode
-      "uint8 num_system_code", # 列挙システムコード数
-      "uint16 system_code[8]", # 列挙システムコード
+      'uint8 num_system_code', # 列挙システムコード数
+      'uint16 system_code[8]', # 列挙システムコード
       # area/service codes
-      "uint8 num_area_code", # エリアコード数
-      "uint16 area_code[16]", # エリアコード
-      "uint16 end_service_code[16]", # エンドサービスコード
-      "uint8 num_service_code", # サービスコード数
-      "uint16 service_code[256]", # サービスコード
+      'uint8 num_area_code', # エリアコード数
+      'uint16 area_code[16]', # エリアコード
+      'uint16 end_service_code[16]', # エンドサービスコード
+      'uint8 num_service_code', # サービスコード数
+      'uint16 service_code[256]', # サービスコード
     ])
   
   extern 'pasori* pasori_open(char *)' # PaSoRi をオープンする 
@@ -54,16 +59,16 @@ module PasoriAPI
     ( ((value & 0xff) << 8) | ((value & 0xff00) >> 8) )
   end
   
-  def get2byte(da,offset)
-    return (da[offset] << 8) | da[offset+1]
+  def get2byte(da, offset)
+    return (da[offset] << 8) | da[offset + 1]
   end
   
-  def get3byte(da,offset)
-    return (da[offset] << 16) |(da[offset+1] << 8) | da[offset+2]
+  def get3byte(da, offset)
+    return (da[offset] << 16) |(da[offset + 1] << 8) | da[offset + 2]
   end
   
-  def get4byte(da,offset)
-    return (da[offset] << 24) |(da[offset+1] << 16) |(da[offset+2] << 8) | da[offset+3]
+  def get4byte(da, offset)
+    return (da[offset] << 24) |(da[offset + 1] << 16) |(da[offset + 2] << 8) | da[offset + 3]
   end
   
 end

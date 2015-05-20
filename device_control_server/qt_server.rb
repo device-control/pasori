@@ -8,6 +8,9 @@ require 'ic_card_device'
 
 require 'pry'
 
+Encoding.default_external = 'utf-8'
+Encoding.default_internal = 'utf-8'
+
 KEEP_ALIVE_TIMEOUT = 10*60 # 10 minutes (この時間無応答ならコネクションを切断する)
 
 
@@ -19,7 +22,7 @@ widget = ServerWidget.new
 widget.ic_card_device = ic_card_device
 widget.show
 # app.exec
-widget.ui['label_user_msg'].text = "起動完了っす！"
+widget.ui['label_user_msg'].text = '起動完了っす！'
 
 # メインスレッド
 EM.run do
@@ -34,7 +37,7 @@ EM.run do
     # メインスレッドで実行される
     puts res
     ic_card_device.ws_conn.send(res)
-    widget.ui['label_user_msg'].text = "読み込み完了！"
+    widget.ui['label_user_msg'].text = '読み込み完了！'
 
   end
   
@@ -65,7 +68,7 @@ EM.run do
       # params[:ws_conn].send("カード情報はあほあほです") # 接続してきたやつに応答を返す。
       # 
       # TODO: デバイスが空いてたらばICカード読み込みか書き込み(factory+state_machineでやりたいね。。。)
-      widget.ui['label_user_msg'].text = "カードかざしてくれ！"
+      widget.ui['label_user_msg'].text = 'カードかざしてくれ！'
       widget.wlog(message)
       ic_card_device.ws_conn = ws_conn
       ic_card_device.clear_data

@@ -1,6 +1,11 @@
 # coding: utf-8
+$LOAD_PATH.unshift(File.expand_path(File.dirname(__FILE__)))
+
 require 'pasori_api'
 require 'pasori_history'
+
+Encoding.default_external = 'utf-8'
+Encoding.default_internal = 'utf-8'
 
 class PasoriReader
   SERVICE_SUICA_HISTORY = 0x090f
@@ -22,11 +27,14 @@ class PasoriReader
   end
   
   def read
-    @histories = Array.new
     @idm_pmm = Hash.new
+    @histories = Array.new
+    
     pasori_connect
+    
     pasori_base_read
     pasori_history_read
+    
     pasori_history = create_history_json
   rescue => ex
     puts "ERROR: #{ex.message}".encode('cp932')
@@ -40,7 +48,7 @@ class PasoriReader
   end
   
   def read_finish
-    if !@pasori_ptr.nil?
+    unless @pasori_ptr.nil?
       PasoriAPI::pasori_close(@pasori_ptr)
       @pasori_ptr = nil
     end
@@ -58,21 +66,21 @@ class PasoriReader
     if pasori_res == 0
       return # 成功
     end
-    raise "Pasoriを接続してください"
+    raise 'Pasoriを接続してください'
   end
   
   def pasori_base_read
     # ベース読み込み
     @base_ptr = PasoriAPI::felica_polling(@pasori_ptr, PasoriAPI::POLLING_ANY, 0, 0)
-    if !@base_ptr.null?
+    unless @base_ptr.null?
       base = PasoriAPI::Felica.new(@base_ptr)
       @idm_pmm[:idm] = base.IDm
       @idm_pmm[:pmm] = base.PMm
-      puts "IDm[#{base.IDm}]"
-      puts "PMm[#{base.PMm}]"
+      puts 'IDm[#{base.IDm}]'
+      puts 'PMm[#{base.PMm}]'
       return
     end
-    raise "ＩＣカードをかざしてください"
+    raise 'ＩＣカードをかざしてください'
   end
   
   # 入出金履歴取得
@@ -94,7 +102,7 @@ class PasoriReader
     # content-version: 0.1
     
     # contents:
-    #   description: "PaSoRiを使って読んだ内容"
+    #   description: 'PaSoRiを使って読んだ内容'
     #   read_status: 1 # 0:読み込み成功, 1:読み込み失敗
     #   pasori_data:
     yaml = Hash.new
@@ -105,8 +113,8 @@ class PasoriReader
     contents[:read_status] = 0
     pasori_data = Hash.new
     contents[:pasori_data] = pasori_data
-    idm = @idm_pmm[:idm].collect {|item| sprintf("%02x",item) }
-    pmm = @idm_pmm[:pmm].collect {|item| sprintf("%02x", item) }
+    idm = @idm_pmm[:idm].collect {|item| sprintf('%02x',item) }
+    pmm = @idm_pmm[:pmm].collect {|item| sprintf('%02x', item) }
     pasori_data[:idm] = idm.join
     pasori_data[:pmm] = pmm.join
     # 履歴データ
@@ -120,7 +128,7 @@ class PasoriReader
   end
   
   def pasori_disconnect
-    if ! @base_ptr.nil?
+    unless @base_ptr.nil?
       PasoriAPI::felica_free(@base_ptr)
       @base_ptr = nil
     end

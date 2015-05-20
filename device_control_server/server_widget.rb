@@ -8,9 +8,12 @@ require 'json'
 
 require 'pry'
 
+Encoding.default_external = 'utf-8'
+Encoding.default_internal = 'utf-8'
+
 class ServerWidget < Qt::Widget
-  WIDGET_NAME = "device server"
-  VERSION = "ver.0.2015.04.14.1700"
+  WIDGET_NAME = 'device server'
+  VERSION = 'ver.0.2015.04.14.1700'
   
   attr_accessor :ic_card_device
   attr_accessor :parameter
@@ -20,7 +23,7 @@ class ServerWidget < Qt::Widget
     super(parent)
     # 画面構成読み込み＆設定
     @formWidget = nil
-    Qt::File.new("qt_server.ui") do |file|
+    Qt::File.new('qt_server.ui') do |file|
       loader = Qt::UiLoader.new
       file.open(Qt::File::ReadOnly)
       @formWidget = loader.load(file, self)
@@ -42,9 +45,9 @@ class ServerWidget < Qt::Widget
   # パラメータ設定
   def set_parameter(parameter)
     ui = Hash.new
-    ui['label_user_msg'] = findChild(Qt::Label, "label_user_msg")
-    ui['listWidget_log'] = findChild(Qt::ListWidget, "listWidget_log")
-    ui['lineEdit_ip'] = findChild(Qt::LineEdit, "lineEdit_ip")
+    ui['label_user_msg'] = findChild(Qt::Label, 'label_user_msg')
+    ui['listWidget_log'] = findChild(Qt::ListWidget, 'listWidget_log')
+    ui['lineEdit_ip'] = findChild(Qt::LineEdit, 'lineEdit_ip')
     # set port number
     ui['lineEdit_ip'].text = parameter['contents']['ip'] + ':' + parameter['contents']['port']
     return ui
@@ -63,7 +66,7 @@ class ServerWidget < Qt::Widget
   end
   
   def dragEnterEvent(event)
-    if event.mimeData().hasFormat("text/uri-list")
+    if event.mimeData().hasFormat('text/uri-list')
       event.acceptProposedAction()
     else
       event.ignore()
@@ -71,7 +74,7 @@ class ServerWidget < Qt::Widget
   end
   
   def dropEvent(event)
-    if event.mimeData().hasFormat("text/uri-list")
+    if event.mimeData().hasFormat('text/uri-list')
       drop_file = event.mimeData().urls().first().toLocalFile() # windows: drop_file は utf-8 で入ってくる。 mac: ???
       puts drop_file.force_encoding('utf-8').encode('cp932')
       wlog('drop file:' + drop_file.force_encoding('utf-8'))

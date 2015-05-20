@@ -12,8 +12,8 @@ class RailData
   include Singleton
   
   # 対象ファイルの定義
-  CONTENT_TYPE    = "rail_data"
-  CONTENT_VERSION = "0.1"
+  CONTENT_TYPE    = 'rail_data'
+  CONTENT_VERSION = '0.1'
   
   def initialize
     @rail_data = nil
@@ -24,18 +24,19 @@ class RailData
   
   def load_yaml
     # 鉄道データファイル読込
-    filepath = File.expand_path(File.dirname(__FILE__)+"/../rail_data_converter/rail_data.yml")
-    if !File.exist?(filepath)
-      puts "ERROR: rail_data.ymlがありません".encode('cp932')
+    filepath = File.expand_path(File.dirname(__FILE__)+'/../rail_data_converter/rail_data.yml')
+    unless File.exist?(filepath)
+      puts 'ERROR: rail_data.ymlがありません'.encode('cp932')
       return
     end
+    
     File.open(filepath) do |file|
       yaml = YAML.load(file.read)
       if target_data?(yaml)
         @rail_data = yaml
         @contents = yaml[:contents]
       else
-        puts "ERROR: rail_data.ymlが対象のファイルではありません".encode('cp932')
+        puts 'ERROR: rail_data.ymlが対象のファイルではありません'.encode('cp932')
       end
     end
   end
@@ -43,7 +44,7 @@ class RailData
   def get_location(company, line_name, station_name)
     # 駅名が一致するデータを取得する
     station = search_station(company, line_name, station_name)
-    if !station.nil?
+    unless station.nil?
       return station[:loc]
     end
     return nil
@@ -59,15 +60,17 @@ class RailData
       if selects.length == 1
         return val
       end
+      
       # 会社名を検索
-      if !fuzzy_search(company, val[:opc])
+      unless fuzzy_search(company, val[:opc])
         next
       end
+      
       # 路線名を検索
-      if !fuzzy_search(line_name, val[:lin])
+      unless fuzzy_search(line_name, val[:lin])
         next
       end
-      # puts "key=#{key} station_name=#{station_name}"
+      # puts 'key=#{key} station_name=#{station_name}'
       return val
     end
     return nil
@@ -90,18 +93,18 @@ class RailData
       index += 1
     end
     
-    # puts "key=#{key} src=#{src} index=#{index}"
+    # puts 'key=#{key} src=#{src} index=#{index}'
     return true if index > (key.length*0.6)
     return false
   end
   
   def target_data?(data)
     if data[:content_type] != CONTENT_TYPE
-      puts "ERROR: content_type".encode('cp932')
+      puts 'ERROR: content_type'.encode('cp932')
       return false
     end
     if data[:content_version] != CONTENT_VERSION
-      puts "ERROR: content_version".encode('cp932')
+      puts 'ERROR: content_version'.encode('cp932')
       return false
     end
     return true
