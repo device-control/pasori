@@ -1,311 +1,62 @@
 # coding: utf-8
-content-type: pasori_history
-content-version: 0.1
+:content_type: pasori_history
+:content_version: 0.1
 
-contents:
-  description: "標準的なカード 000"
-  read_status: 0 # 0:読み込み成功, 1:読み込み失敗
-  pasori_data:
-    idm: "0000000000000000"
-    pmm: "1234567890123456"
-    history:
-      - ctype: 1
-        ctype_name: "改札機"
-        proc: 2
-        proc_name: "運賃支払"
-        date: 3
-        date_string: "14/04/01"
-        time: 4
-        time_string: "12:34"
-        balance: 1000
-        region: 5
-        seq: 6
-        in_line: 100
-        in_sta: 101
-        out_line: 200
-        out_sta: 201
-      - ctype: 1
-        ctype_name: "改札機"
-        proc: 2
-        proc_name: "運賃支払"
-        date: 3
-        date_string: "14/04/01"
-        time: 4
-        time_string: "12:34"
-        balance: 1000
-        region: 5
-        seq: 6
-        in_line: 100
-        in_sta: 101
-        out_line: 200
-        out_sta: 201
-      - ctype: 1
-        ctype_name: "改札機"
-        proc: 2
-        proc_name: "運賃支払"
-        date: 3
-        date_string: "14/04/01"
-        time: 4
-        time_string: "12:34"
-        balance: 1000
-        region: 5
-        seq: 6
-        in_line: 100
-        in_sta: 101
-        out_line: 200
-        out_sta: 201
-      - ctype: 1
-        ctype_name: "改札機"
-        proc: 2
-        proc_name: "運賃支払"
-        date: 3
-        date_string: "14/04/01"
-        time: 4
-        time_string: "12:34"
-        balance: 1000
-        region: 5
-        seq: 6
-        in_line: 100
-        in_sta: 101
-        out_line: 200
-        out_sta: 201
-      - ctype: 1
-        ctype_name: "改札機"
-        proc: 2
-        proc_name: "運賃支払"
-        date: 3
-        date_string: "14/04/01"
-        time: 4
-        time_string: "12:34"
-        balance: 1000
-        region: 5
-        seq: 6
-        in_line: 100
-        in_sta: 101
-        out_line: 200
-        out_sta: 201
-      - ctype: 1
-        ctype_name: "改札機"
-        proc: 2
-        proc_name: "運賃支払"
-        date: 3
-        date_string: "14/04/01"
-        time: 4
-        time_string: "12:34"
-        balance: 1000
-        region: 5
-        seq: 6
-        in_line: 100
-        in_sta: 101
-        out_line: 200
-        out_sta: 201
-      - ctype: 1
-        ctype_name: "改札機"
-        proc: 2
-        proc_name: "運賃支払"
-        date: 3
-        date_string: "14/04/01"
-        time: 4
-        time_string: "12:34"
-        balance: 1000
-        region: 5
-        seq: 6
-        in_line: 100
-        in_sta: 101
-        out_line: 200
-        out_sta: 201
-      - ctype: 1
-        ctype_name: "改札機"
-        proc: 2
-        proc_name: "運賃支払"
-        date: 3
-        date_string: "14/04/01"
-        time: 4
-        time_string: "12:34"
-        balance: 1000
-        region: 5
-        seq: 6
-        in_line: 100
-        in_sta: 101
-        out_line: 200
-        out_sta: 201
-      - ctype: 1
-        ctype_name: "改札機"
-        proc: 2
-        proc_name: "運賃支払"
-        date: 3
-        date_string: "14/04/01"
-        time: 4
-        time_string: "12:34"
-        balance: 1000
-        region: 5
-        seq: 6
-        in_line: 100
-        in_sta: 101
-        out_line: 200
-        out_sta: 201
-      - ctype: 1
-        ctype_name: "改札機"
-        proc: 2
-        proc_name: "運賃支払"
-        date: 3
-        date_string: "14/04/01"
-        time: 4
-        time_string: "12:34"
-        balance: 1000
-        region: 5
-        seq: 6
-        in_line: 100
-        in_sta: 101
-        out_line: 200
-        out_sta: 201
-      - ctype: 1
-        ctype_name: "改札機"
-        proc: 2
-        proc_name: "運賃支払"
-        date: 3
-        date_string: "14/04/01"
-        time: 4
-        time_string: "12:34"
-        balance: 1000
-        region: 5
-        seq: 6
-        in_line: 100
-        in_sta: 101
-        out_line: 200
-        out_sta: 201
-      - ctype: 1
-        ctype_name: "改札機"
-        proc: 2
-        proc_name: "運賃支払"
-        date: 3
-        date_string: "14/04/01"
-        time: 4
-        time_string: "12:34"
-        balance: 1000
-        region: 5
-        seq: 6
-        in_line: 100
-        in_sta: 101
-        out_line: 200
-        out_sta: 201
-      - ctype: 1
-        ctype_name: "改札機"
-        proc: 2
-        proc_name: "運賃支払"
-        date: 3
-        date_string: "14/04/01"
-        time: 4
-        time_string: "12:34"
-        balance: 1000
-        region: 5
-        seq: 6
-        in_line: 100
-        in_sta: 101
-        out_line: 200
-        out_sta: 201
-      - ctype: 1
-        ctype_name: "改札機"
-        proc: 2
-        proc_name: "運賃支払"
-        date: 3
-        date_string: "14/04/01"
-        time: 4
-        time_string: "12:34"
-        balance: 1000
-        region: 5
-        seq: 6
-        in_line: 100
-        in_sta: 101
-        out_line: 200
-        out_sta: 201
-      - ctype: 1
-        ctype_name: "改札機"
-        proc: 2
-        proc_name: "運賃支払"
-        date: 3
-        date_string: "14/04/01"
-        time: 4
-        time_string: "12:34"
-        balance: 1000
-        region: 5
-        seq: 6
-        in_line: 100
-        in_sta: 101
-        out_line: 200
-        out_sta: 201
-      - ctype: 1
-        ctype_name: "改札機"
-        proc: 2
-        proc_name: "運賃支払"
-        date: 3
-        date_string: "14/04/01"
-        time: 4
-        time_string: "12:34"
-        balance: 1000
-        region: 5
-        seq: 6
-        in_line: 100
-        in_sta: 101
-        out_line: 200
-        out_sta: 201
-      - ctype: 1
-        ctype_name: "改札機"
-        proc: 2
-        proc_name: "運賃支払"
-        date: 3
-        date_string: "14/04/01"
-        time: 4
-        time_string: "12:34"
-        balance: 1000
-        region: 5
-        seq: 6
-        in_line: 100
-        in_sta: 101
-        out_line: 200
-        out_sta: 201
-      - ctype: 1
-        ctype_name: "改札機"
-        proc: 2
-        proc_name: "運賃支払"
-        date: 3
-        date_string: "14/04/01"
-        time: 4
-        time_string: "12:34"
-        balance: 1000
-        region: 5
-        seq: 6
-        in_line: 100
-        in_sta: 101
-        out_line: 200
-        out_sta: 201
-      - ctype: 1
-        ctype_name: "改札機"
-        proc: 2
-        proc_name: "運賃支払"
-        date: 3
-        date_string: "14/04/01"
-        time: 4
-        time_string: "12:34"
-        balance: 1000
-        region: 5
-        seq: 6
-        in_line: 100
-        in_sta: 101
-        out_line: 200
-        out_sta: 201
-      - ctype: 1
-        ctype_name: "改札機"
-        proc: 2
-        proc_name: "運賃支払"
-        date: 3
-        date_string: "14/04/01"
-        time: 4
-        time_string: "12:34"
-        balance: 1000
-        region: 5
-        seq: 6
-        in_line: 100
-        in_sta: 101
-        out_line: 200
-        out_sta: 201
+:contents:
+  :description: "標準的なカード 001"
+  :read_status: 0 # 0:読み込み成功, 1:読み込み失敗
+  :pasori_data:
+    :idm: "1122334455667788"
+    :pmm: "1234567890123456"
+    :histories:
+      - # 端末種
+        :ctype: 1
+        # 処理
+        :proc: 2
+        # ??
+        :dummy: 3
+        # 日付
+        :date: 4
+        # 入場駅
+        :in_line: 5
+        :in_sta: 6
+        # 出場駅
+        :out_line: 7
+        :out_sta: 8
+        # 残高
+        :balance: 9
+        # 連番
+        :seq: 10
+        # リージョン
+        :region: 11
+        # 時刻
+        :time: 12
+        # 以下は、設定しなければコードから生成する
+        # 端末種
+        :ctype_name: "精算機"
+        # 処理
+        :proc_name: "運賃支払(改札出場)"
+        # 日付
+        :date_string: "2015/01/02"
+        # 入場駅情報
+        :in_station_info:
+          :company: "西日本旅客鉄道"
+          :line_name: "東海道本"
+          :station_name: "大阪"
+        # 入場駅位置
+        :in_station_location:
+          :lat: 34.70232500
+          :lng: 135.49509500
+        # 出場駅
+        :out_station_info:
+          :company_name: "西日本旅客鉄道"
+          :line_name: "東海道本"
+          :station_name: "新大阪"
+        # 出場駅位置
+        :out_station_location:
+          :lat: 34.73404100
+          :lng: 135.50198900
+        # 残高
+        :balance_string: "10,000円"
+        # 時刻
+        :time_string: "12:34"

@@ -1,74 +1,94 @@
 # coding: utf-8
+$LOAD_PATH.unshift(File.expand_path(File.dirname(__FILE__)))
+
+require 'state_machine'
 require 'pasori_reader'
 require 'dropfile_reader'
+
+Encoding.default_external = 'utf-8'
+Encoding.default_internal = 'utf-8'
 
 class ICCardDevice
   RETRY_COUNT_READ = 60
   
-  attr_accessor :ws_conn
-  attr_accessor :connect_signature
+  state_machine :state, :initial => :idle do
+    
+    after_failure :on => :read_start, :do => :failure
+    after_failure :on => :read_end, :do => :failure
+    
+    event :read_start do
+      transition :idle => :reading
+    end
+    
+    event :read_end do
+      transition :reading => :idle
+    end
+    
+    state :idle do
+      def read
+        self.read_start
+        res = execute_read
+        self.read_end
+        return res
+      end
+    end
+    
+    state :reading do
+      def read
+        puts 'ERROR: ic_card_device 読み込み中'.encode('cp932')
+        return ''
+      end
+    end
+    
+  end
   
   def initialize
-    # ここで本当のデバイスの初期化や接続処理を行う
-    @connect_signature = nil
     # 使用するReaderを生成
-    @reader = Array.new
-    @reader.push PasoriReader.new
-    @reader.push DropFileReader.new
+    @pasori_reader = PasoriReader.new
+    @dropfile_reader = DropFileReader.new
+    super()
   end
   
   def set_data(data)
-    @reader.each do |r|
-      r.set_data(data)
-    end
+    @pasori_reader.set_data(data)
+    @dropfile_reader.set_data(data)
   end
   
   def clear_data
-    @reader.each do |r|
-      r.clear_data
-    end
+    @pasori_reader.clear_data
+    @dropfile_reader.clear_data
   end
   
-  def read
-    json = nil
+  def execute_read
     # read 初期化
-    read_init
+    json = nil
+    @pasori_reader.read_init
+    @dropfile_reader.read_init
+    
     # read 処理実行
     catch :loop do
       RETRY_COUNT_READ.times do
-        @reader.each do |r|
-          json = r.read
-          throw :loop if !json.nil?
-        end
+        json = @pasori_reader.read
+        throw :loop unless json.nil?
+        
+        json = @dropfile_reader.read
+        throw :loop unless json.nil?
+        
         sleep(1)
       end
     end
+    
     # read 後処理
-    read_finish
+    @pasori_reader.read_finish
+    @dropfile_reader.read_finish
+    
     # read 結果
-    if json.nil?
-      puts 'ERROR: Read失敗'.encode('cp932')
-      return ""
-    end
+    json = '' if json.nil?
     return json
   end
   
-  def read_init
-    @reader.each do |r|
-      r.read_init
-    end
-  end
-  
-  def read_finish
-    @reader.each do |r|
-      r.read_finish
-    end
-  end
-  
-  def write(body)
-    # dummy...
-    sleep(5)
-    return 
+  def failure
+    puts 'ERROR: 状態遷移失敗'.encode('cp932')
   end
   
 end

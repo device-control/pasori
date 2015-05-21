@@ -9,18 +9,18 @@ class ConvertStation2
   def initialize
     @contents = Hash.new
     @id = nil
-    @station = nil
+    @data = nil
     @last_tag = nil
   end
   
   def tag_start(name, attrs)
     case name
     when 'ksj:Station2'
-      @station = Hash.new
-      @id = attrs['gml:id']
+      @data = Hash.new
+      @id = attrs['gml:id'].to_sym
     when 'ksj:loc'
       if xlink = attrs['xlink:href']
-        @station[name] = xlink.gsub(/^#/,'')
+        @data[:loc] = xlink.gsub(/^#/,'')
       end
     end
     @last_tag = name
@@ -29,11 +29,11 @@ class ConvertStation2
   def text(text)
     case @last_tag
     when 'ksj:lin'
-      @station[@last_tag] = text
+      @data[:lin] = text
     when 'ksj:opc'
-      @station[@last_tag] = text
+      @data[:opc] = text
     when 'ksj:stn'
-      @station[@last_tag] = text
+      @data[:stn] = text
     end
   end
   
@@ -41,11 +41,15 @@ class ConvertStation2
     case name
     when 'ksj:Station2'
       puts @id
-      @contents[@id] = @station if @id
+      @contents[@id] = @data if @id
       @id =nil
-      @station = nil
+      @data = nil
     end
     @last_tag = nil
+  end
+  
+  def get_data(id)
+    return @contents[id]
   end
   
   def save

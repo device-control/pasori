@@ -9,15 +9,15 @@ class ConvertPoint
   def initialize
     @contents = Hash.new
     @id = nil
-    @point = nil
+    @data = nil
     @last_tag = nil
   end
   
   def tag_start(name, attrs)
     case name
     when 'gml:Point'
-      @point = Hash.new
-      @id = attrs['gml:id']
+      @data = Hash.new
+      @id = attrs['gml:id'].to_sym
     end
     @last_tag = name
   end
@@ -25,7 +25,7 @@ class ConvertPoint
   def text(text)
     case @last_tag
     when 'gml:pos'
-      @point[@last_tag] = get_pos(text)
+      @data = get_pos(text)
     end
   end
   
@@ -33,22 +33,25 @@ class ConvertPoint
     case name
     when 'gml:Point'
       puts @id
-      @contents[@id] = @point if @id
+      @contents[@id] = @data if @id
       @id =nil
-      @point = nil
+      @data = nil
     end
     @last_tag = nil
   end
   
   def get_pos(text)
-    pos = Hash.new
-    pos[:lat] = nil
-    pos[:lng] = nil
     if text.match(/(\d+.\d+) +(\d+.\d+)/)
+      pos = Hash.new
       pos[:lat] = $1
       pos[:lng] = $2
+      return pos
     end
-    return pos
+    return nil
+  end
+  
+  def get_data(id)
+    return @contents[id]
   end
   
   def save
