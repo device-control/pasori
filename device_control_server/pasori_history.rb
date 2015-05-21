@@ -33,7 +33,7 @@ class PasoriHistory
     
     @data = Hash.new
     # バイナリデータ
-    data[:binary] = data.collect{|d| '%02X' % d}.join
+    # @data[:binary] = data.collect{|d| '%02X' % d}.join
     # 0: 端末種
     @data[:ctype] = data[0]
     # 1: 処理
@@ -80,48 +80,48 @@ class PasoriHistory
   # 既に文字列データがある場合は追加しない
   def add_string_data!
     # 端末名
-    unless @data[:ctype].nil?
-      @data[:ctype_name] = get_console_type(@data[:ctype]) if @data[:ctype_name].nil?
+    if @data[:ctype_name].nil?
+      @data[:ctype_name] = get_console_type(@data[:ctype])
     end
     
     # 処理名
-    unless @data[:proc].nil?
-      @data[:proc_name] = get_proc_type(@data[:proc]) if @data[:proc_name].nil?
+    if @data[:proc_name].nil?
+      @data[:proc_name] = get_proc_type(@data[:proc])
     end
     
     # 日付 (先頭から7ビットが年、４ビットが月、残り５ビットが日)
-    unless @data[:date].nil?
-      @data[:date_string] = get_date_string(@data[:date]) if @data[:date_string].nil?
+    if @data[:date_string].nil?
+      @data[:date_string] = get_date_string(@data[:date])
     end
     
     # 入場駅関連
-    unless @data[:in_line].nil? || @data[:in_sta].nil?
-      @data[:in_station_info] = get_station_info(@data[:in_line], @data[:in_sta], @data[:region]) if @data[:in_station_info].nil?
+    if @data[:in_station_info].nil?
+      @data[:in_station_info] = get_station_info(@data[:in_line], @data[:in_sta], @data[:region])
     end
     
     # 入場駅の位置
-    unless @data[:in_station_info].nil?
-      @data[:in_station_location] = get_station_location(@data[:in_station_info]) if @data[:in_station_location].nil?
+    if @data[:in_station_location].nil?
+      @data[:in_station_location] = get_station_location(@data[:in_station_info])
     end
     
     # 出場駅関連
-    unless @data[:out_line].nil? || @data[:out_sta].nil?
-      @data[:out_station_info] = get_station_info(@data[:out_line], @data[:out_sta], @data[:region]) if @data[:out_station_info].nil?
+    if @data[:out_station_info].nil?
+      @data[:out_station_info] = get_station_info(@data[:out_line], @data[:out_sta], @data[:region])
     end
     
     # 出場駅の位置
-    unless @data[:out_station_info].nil?
-      @data[:out_station_location] = get_station_location(@data[:out_station_info]) if @data[:out_station_location].nil?
+    if @data[:out_station_location].nil?
+      @data[:out_station_location] = get_station_location(@data[:out_station_info])
     end
     
     # 残高
-    unless @data[:balance].nil?
-      @data[:balance_string] = get_balance_string(@data[:balance]) if @data[:balance_string].nil?
+    if @data[:balance_string].nil?
+      @data[:balance_string] = get_balance_string(@data[:balance])
     end
     
     # 時刻
-    unless @data[:time].nil?
-      @data[:time_string] = get_time_string(@data[:time]) if @data[:time_string].nil?
+    if @data[:time_string].nil?
+      @data[:time_string] = get_time_string(@data[:time])
     end
     
     return self
@@ -129,17 +129,23 @@ class PasoriHistory
   
   # 駅情報取得
   def get_station_info(line, station, region)
+    return nil if line.nil? || station.nil? || region.nil?
+    
     areacode = get_areacode(line, region)
     return @station_info.code_to_info(areacode, line, station)
   end
   
   # 駅位置取得
   def get_station_location(info)
+    return nil if info.nil?
+    
     return @rail_data.get_location(info[:company], info[:line_name], info[:station_name])
   end
   
   # 端末名
   def get_console_type(ctype)
+    return nil if ctype.nil?
+    
     case ctype
     when 3; '精算機'
     when 4; '携帯型端末'
@@ -169,6 +175,8 @@ class PasoriHistory
   
   # 処理名
   def get_proc_type(proc)
+    return nil if proc.nil?
+    
     case proc
     when 1; '運賃支払(改札出場)'
     when 2; 'チャージ'
@@ -202,6 +210,8 @@ class PasoriHistory
   # 日付文字列 (先頭から7ビットが年、４ビットが月、残り５ビットが日)
   # YYYY:MM:DD フォーマットとする
   def get_date_string(date)
+    return nil if date.nil?
+    
     # 年は20XXに補正する
     year = (date >> 9) + 2000
     month = (date >> 5) & 0xf
@@ -212,6 +222,8 @@ class PasoriHistory
   # 時刻文字列 (先頭から5ビットが時、6ビットが分、残り５ビットが秒？)
   # hh:mm フォーマットとする
   def get_time_string(time)
+    return nil if time.nil?
+    
     hour = (time >> 11)
     minute = (time >> 5) & 0x3f
     seconds = (time & 0x1f)
@@ -221,6 +233,7 @@ class PasoriHistory
   # 残高文字列
   # カンマ区切りで単位を'円'にする
   def get_balance_string(balance)
+    return nil if balance.nil?
     return balance.to_s.gsub(/(\d)(?=(\d{3})+(?!\d))/, '\1,') + '円'
   end
   
