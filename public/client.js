@@ -471,8 +471,16 @@ jQuery(function ($) {
     }]
   });
   layer2.setMap(map);
-
-
+  google.maps.event.addListener(layer2, 'click', function(e) {
+    // Change the content of the InfoWindow
+    e.infoWindowHtml =
+      '事業者：' + e.row['company_name'].value + "<br>" +
+      '路線：' + e.row['line_name'].value;
+    if( e.row['data_type'].value == 'station') {
+      e.infoWindowHtml += '<br>駅名：' + e.row['station_name'].value;
+    }
+  });
+  
   //
   // Google Maps APIの「お天気＆雲レイヤ」と「Panoramioレイヤ」は2015年に廃止されるそうです。
   //  http://shimz.me/blog/google-map-api/3556
