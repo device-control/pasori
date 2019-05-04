@@ -25,6 +25,7 @@ db/*.sqlite3
 /db/*.sqlite3-journal
 /log/*
 /tmp/*
+py_server/env2
 
 # various artifacts
 **.war
