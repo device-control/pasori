@@ -1,0 +1,9 @@
+:content_type: rail_data
+:content_version: '0.1'
+:contents:
+- :lin: 函館線
+  :opc: 北海道旅客鉄道（旧国鉄）
+  :loc:
+    :lat: '43.76344000'
+    :lng: '142.35792000'
+  :stn: 旭川
