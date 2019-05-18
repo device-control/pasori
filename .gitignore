@@ -26,6 +26,7 @@ db/*.sqlite3
 /log/*
 /tmp/*
 py_server/env2
+py_server/nfcpy
 
 # various artifacts
 **.war

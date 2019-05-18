@@ -15,8 +15,9 @@ from websocket_server import WebsocketServer
 
 num_blocks = 20
 service_code = 0x090f
-ic_card_buffer = {}
-station_infos = {}
+ic_card_buffer = None
+station_infos = None
+clf = None
 
 class StationRecord(object):
   db = None
@@ -181,7 +182,7 @@ def connected(tag):
           }
         }
         histories.append(history_dict)
-        print("--- _json ---¥n%s" % json.dumps(ic_card_buffer))
+        # print("--- _json ---¥n%s" % json.dumps(ic_card_buffer))
     except Exception as e:
       print "error: %s" % e
     else:
@@ -206,9 +207,10 @@ def message_received(client, server, message):
     # message = message[:200]+'..'
     print("Client(%d) message: %s" % (client['id'], message))
     
-    clf = nfc.ContactlessFrontend('usb')
+    print("pasori read")
+    global clf
     clf.connect(rdwr={'on-connect': connected})
-  
+    
     # time.sleep(5)
     # 送信してきたクライアントにメッセージ送信
     print("--- json ---¥n%s" % json.dumps(ic_card_buffer))
@@ -216,9 +218,13 @@ def message_received(client, server, message):
 
 
 if __name__ == "__main__":
+  print("read station_infos.yml")
   station_infos = yaml.load(codecs.open('station_infos.yml', 'r', 'utf-8'))
+  print("open pasori")
+  clf = nfc.ContactlessFrontend('usb')
+  print("open websocket")
   PORT=3001
-  server = WebsocketServer(PORT)
+  server = WebsocketServer(PORT, host='0.0.0.0')
   server.set_fn_new_client(new_client)
   server.set_fn_client_left(client_left)
   server.set_fn_message_received(message_received)

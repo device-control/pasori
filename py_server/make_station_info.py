@@ -25,6 +25,8 @@ if __name__ == "__main__":
   # pdb.set_trace()
   # rail_data = rail_data.encode('utf-8')
   # rail_data = yaml.load(rail_data)
+  
+  # 駅の座標データ(yaml)を、鉄道会社名_駅名をkeyにdict型に詰めなおす
   rail_data = yaml.load(codecs.open('rail_data.yml', 'r', 'utf-8'))
   station_positions = rail_data[':contents']
   # - :lin: 東海道線
@@ -64,15 +66,35 @@ if __name__ == "__main__":
     ":lat": '35.68173200',
     ":lng": '139.76538400'
   }
+  # 位置情報検索するための鉄道会社名変換テーブル
+  change_companys = {
+    # station_code.yml, rail_data.yml
+    '大阪市交通局': '大阪市',
+    '大阪港トランスポートシステム': '大阪市',
+    '東京都交通局': '東京都',
+    '名古屋市交通局': '名古屋市',
+    '名古屋市営地下鉄': '名古屋市',
+    'IGRいわて銀河鉄道': 'アイジーアールいわて銀河鉄道',
+    'JR九州': '九州旅客鉄道',
+    '福岡市交通局': '福岡市',
+    '札幌市交通局': '札幌市',
+    '横浜市交通局':'横浜市',
+    '神戸市交通局':'神戸市',
+    '京都市交通局':'京都市',
+  }
+  
   station_infos = {}
   for station_key, station_value in stations.items():
-    name = station_value[":company"] + "_" + station_value[":station_name"]
-    name = name.encode('utf-8')
+    company = station_value[":company"].encode('utf-8')
+    if company in change_companys:
+      company = change_companys[company]
+    name = company + "_" + station_value[":station_name"].encode('utf-8')
     station_value[":location"] = default_location
     # station_value[":name"] = name
     if name in locations:
-      print name
       station_value[":location"] = locations[name]
+    else:
+      print name
     # pdb.set_trace()
     station_info = {
       "company": station_value[":company"].encode('utf-8'),
@@ -85,18 +107,15 @@ if __name__ == "__main__":
     }
     station_infos[station_key] = station_info
     
-  # f = codecs.open("test.yml", "w", 'utf-8')
-  # f.write( yaml.dump(station_infos, encoding='utf-8') ) # , allow_unicode=True)))
-  # f.close()
   f = codecs.open("station_infos.yml", "w")
   for station_key, station_value in station_infos.items():
-    f.write( station_key + ":" + '\n')
-    f.write( "  company: " + station_value["company"] + "\n")
-    f.write( "  line_name: " + station_value["line_name"] + '\n')
-    f.write( "  station_name: " + station_value["station_name"] + '\n')
-    f.write( "  location:\n")
-    f.write( "    lat: " + station_value["location"]["lat"] + '\n')
-    f.write( "    lng: " + station_value["location"]["lng"] + '\n')
+    f.write( "  " + station_key + ":" + '\n')
+    f.write( "    company: '" + station_value["company"] + "'\n")
+    f.write( "    line_name: '" + station_value["line_name"] + "'\n")
+    f.write( "    station_name: '" + station_value["station_name"] + "'\n")
+    f.write( "    location:\n")
+    f.write( "      lat: " + station_value["location"]["lat"] + "\n")
+    f.write( "      lng: " + station_value["location"]["lng"] + "\n")
   f.close()
 
   # csv_reader = csv.reader(open("StationCode.csv", 'rU'), delimiter=',', dialect=csv.excel_tab)
