@@ -6,6 +6,9 @@ import binascii
 import os
 import struct
 import sys
+import yaml
+import codecs
+import pdb
 
 # sys.path.append(os.path.dirname(os.path.abspath(__file__)) + '/nfcpy')
 
@@ -13,7 +16,8 @@ import nfc
 
 num_blocks = 20
 service_code = 0x090f
- 
+station_infos = {}
+
 class StationRecord(object):
   db = None
  
@@ -62,7 +66,27 @@ class HistoryRecord(object):
  
     self.in_station = StationRecord.get_station(row_be[4], row_be[5])
     self.out_station = StationRecord.get_station(row_be[6], row_be[7])
- 
+    self.in_station_info = self.get_station_info(row_be[4], row_be[5])
+    self.out_station_info = self.get_station_info(row_be[6], row_be[7])
+      
+  @classmethod
+  def get_station_info(cls, line_no, station_no):
+    global station_infos
+    default_station_info = {
+      "company": "unknown",
+      "line_name": "unknown",
+      "station_name": "unknown",
+      "location": {
+        "lat": 34.73404100,
+        "lng": 135.50198900
+      }
+    }
+    station_info = default_station_info.copy()
+    station_key = '000-{:03}-{:03}'.format(line_no, station_no)
+    if( station_key in station_infos ):
+      station_info = station_infos[station_key]
+    return station_info
+  
   @classmethod
   def get_console(cls, key):
     # よく使われそうなもののみ対応
@@ -113,6 +137,8 @@ def connected(tag):
         print "出線区: %s-%s" % (history.out_station.company_value, history.out_station.line_value)
         print "出駅順: %s" % history.out_station.station_value
         print "残高: %d" % history.balance
+        print "in_station_info %s" % history.in_station_info
+        print "out_station_info %s" % history.out_station_info
         print "BIN: " 
         print "" . join(['%02x ' % s for s in data])
     except Exception as e:
@@ -121,5 +147,6 @@ def connected(tag):
     print "error: tag isn't Type3Tag"
  
 if __name__ == "__main__":
+  station_infos = yaml.load(codecs.open('station_infos.yml', 'r', 'utf-8'))
   clf = nfc.ContactlessFrontend('usb')
   clf.connect(rdwr={'on-connect': connected})
