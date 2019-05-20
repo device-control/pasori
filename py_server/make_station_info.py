@@ -107,11 +107,7 @@ if __name__ == "__main__":
     }
     station_infos[station_key] = station_info
     
-  # f = codecs.open("test.yml", "w", 'utf-8')
-  # f.write( yaml.dump(station_infos, encoding='utf-8') ) # , allow_unicode=True)))
-  # f.close()
-  f = codecs.open("station_info.yml", "w")
-  f.write( "contents:\n")
+  f = codecs.open("station_infos.yml", "w")
   for station_key, station_value in station_infos.items():
     f.write( "  " + station_key + ":" + '\n')
     f.write( "    company: '" + station_value["company"] + "'\n")

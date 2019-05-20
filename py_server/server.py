@@ -7,12 +7,17 @@ import binascii
 import time
 import nfc
 import json
+import yaml
+import codecs
+import pdb
+
 from websocket_server import WebsocketServer
 
 num_blocks = 20
 service_code = 0x090f
-ic_card_buffer = {}
-
+ic_card_buffer = None
+station_infos = None
+clf = None
 
 class StationRecord(object):
   db = None
@@ -51,7 +56,7 @@ class HistoryRecord(object):
     row_be = struct.unpack('>2B2H4BH4B', data)
     # リトルエンディアンでバイト列を解釈する
     row_le = struct.unpack('<2B2H4BH4B', data)
- 
+
     self.db = None
     self.console = self.get_console(row_be[0])
     self.process = self.get_process(row_be[1])
@@ -62,6 +67,26 @@ class HistoryRecord(object):
  
     self.in_station = StationRecord.get_station(row_be[4], row_be[5])
     self.out_station = StationRecord.get_station(row_be[6], row_be[7])
+    self.in_station_info = self.get_station_info(row_be[4], row_be[5])
+    self.out_station_info = self.get_station_info(row_be[6], row_be[7])
+
+  @classmethod
+  def get_station_info(cls, line_no, station_no):
+    global station_infos
+    default_station_info = {
+      "company": "unknown",
+      "line_name": "unknown",
+      "station_name": "unknown",
+      "location": {
+        "lat": 34.73404100,
+        "lng": 135.50198900
+      }
+    }
+    station_info = default_station_info.copy()
+    station_key = '000-{:03}-{:03}'.format(line_no, station_no)
+    if( station_key in station_infos ):
+      station_info = station_infos[station_key]
+    return station_info
  
   @classmethod
   def get_console(cls, key):
@@ -93,7 +118,7 @@ class HistoryRecord(object):
   @classmethod
   def get_day(cls, date):
     return (date >> 0) & 0x1f
- 
+  
 def connected(tag):
   print tag
   
@@ -138,31 +163,30 @@ def connected(tag):
           "date_string": "20%d/%02d/%02d" % (history.year, history.month, history.day),
           "balance_string": "%d" % history.balance,
           "in_station_info": {
-            "company": "西日本旅客鉄道",
-            "line_name": "東海道本",
-            "station_name": "大阪"
+            "company": history.in_station_info["company"],
+            "line_name": history.in_station_info["line_name"],
+            "station_name": history.in_station_info["station_name"]
           },
           "in_station_location": {
-            "lat": 34.70232500,
-            "lng": 135.49509500
+            "lat": history.in_station_info["location"]["lat"],
+            "lng": history.in_station_info["location"]["lng"]
           },
           "out_station_info": {
-            "company_name": "西日本旅客鉄道",
-            "line_name": "東海道本",
-            "station_name": "新大阪"
+            "company": history.out_station_info["company"],
+            "line_name": history.out_station_info["line_name"],
+            "station_name": history.out_station_info["station_name"]
           },
           "out_station_location": {
-            "lat": 34.73404100,
-            "lng": 135.50198900
+            "lat": history.out_station_info["location"]["lat"],
+            "lng": history.out_station_info["location"]["lng"]
           }
         }
         histories.append(history_dict)
-        print("--- _json ---¥n%s" % json.dumps(ic_card_buffer))
+        # print("--- _json ---¥n%s" % json.dumps(ic_card_buffer))
     except Exception as e:
       print "error: %s" % e
     else:
       print "error: tag isn't Type3Tag"
-    
 
 # 接続
 # Called for every client connecting (after handshake)
@@ -183,9 +207,10 @@ def message_received(client, server, message):
     # message = message[:200]+'..'
     print("Client(%d) message: %s" % (client['id'], message))
     
-    clf = nfc.ContactlessFrontend('usb')
+    print("pasori read")
+    global clf
     clf.connect(rdwr={'on-connect': connected})
-  
+    
     # time.sleep(5)
     # 送信してきたクライアントにメッセージ送信
     print("--- json ---¥n%s" % json.dumps(ic_card_buffer))
@@ -193,8 +218,13 @@ def message_received(client, server, message):
 
 
 if __name__ == "__main__":
-  PORT=9001
-  server = WebsocketServer(PORT)
+  print("read station_infos.yml")
+  station_infos = yaml.load(codecs.open('station_infos.yml', 'r', 'utf-8'))
+  print("open pasori")
+  clf = nfc.ContactlessFrontend('usb')
+  print("open websocket")
+  PORT=3001
+  server = WebsocketServer(PORT, host='0.0.0.0')
   server.set_fn_new_client(new_client)
   server.set_fn_client_left(client_left)
   server.set_fn_message_received(message_received)
