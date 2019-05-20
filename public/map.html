@@ -1,0 +1,149 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>pasori reader</title>
+  <!-- CDN -->
+  <!-- https://fezvrasta.github.io/bootstrap-material-design/ -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons">
+  <link rel="stylesheet" href="https://unpkg.com/bootstrap-material-design@4.1.1/dist/css/bootstrap-material-design.min.css" integrity="sha384-wXznGJNEXNG1NFsbm0ugrLFMQPWswR3lds2VeinahP8N0zJw9VWSopbjv2x7WCvX" crossorigin="anonymous">
+  
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/popper.js@1.12.6/dist/umd/popper.js" integrity="sha384-fA23ZRQ3G/J53mElWqVJEGJzU0sTs+SvzG8fXVWP+kJQ1lwFAOkcUOysnlKJC33U" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/bootstrap-material-design@4.1.1/dist/js/bootstrap-material-design.js" integrity="sha384-CauSuKpEqAFajSpkdjv3z9t8E7RlpJ1UP0lKM/+NdtSarroVKu069AlsRPKkFBz9" crossorigin="anonymous"></script>
+
+  <!-- 以下がgoogle map公式設定 有料以降に伴い変更する必要がある。。。 -->
+  <script src="http://maps.googleapis.com/maps/api/js?sensor=false&region=JP"></script>
+  <script src="map_client.js"></script>
+  <script>
+   $(document).ready(function() {
+     $('body').bootstrapMaterialDesign();
+   });
+  </script>
+  <style type="text/css">
+   .kitchen-sink-drawer {
+     $custom-size: 500px;
+     @include bmd-drawer-x-out($custom-size);
+     &:not(.bmd-drawer-out) {
+       @each $breakpoint in map-keys($grid-breakpoints) {
+         @include bmd-drawer-x-in-up($custom-size, $breakpoint);
+       }
+     }
+   }
+  </style>
+  
+</head>
+<body>
+  <div class="container">
+    <div class="form-inline">
+      <div class="form-group">
+        <label>PaSoRi端末接続先：</label>
+        <!-- <input type="text" class="form-control pasori-address" id="exampleInputName2" placeholder="172.0.0.1:3001" value="localhost:3001"> -->
+        <input class="form-control pasori-address" type="text" placeholder="127.0.0.1:3001" value="localhost:3001">
+        <input class="connect btn btn-primary" type="button" value="connect">
+        <input class="disconnect btn btn-primary" type="button" value="disconnect">
+        <label>状態：</label>
+        <label class="status"></label>
+      </div>
+    </div>
+    
+    <div>
+      <p>
+        <input class="read btn btn-info" type="button" value="read">
+        <input class="clear btn btn-default" type="button" value="clear">
+      </p>
+    </div>
+
+    <div class="row">
+      <div class="col-md-12" style="position: relative; padding-bottom: 75%;">
+        <!-- <div id="map-canvas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"> -->
+        <div id="map-canvas" style="position: absolute; width: 100%; height: 100%;">
+        </div>
+        <div class="col-md-12" style="position:absolute; top: 0px; left: 0px; width: 80%; height: 100%; background-color: transparent; pointer-events: none;">
+          <div class="bmd-layout-container bmd-drawer-f-t">
+            <header class="bmd-layout-header">
+              <div class="navbar-light bg-faded">
+                <button class="navbar-toggler" type="button" data-toggle="drawer" data-target="#dw-s1" aria-expanded="false" style="pointer-events: auto;">
+                  <span class="sr-only">Toggle drawer</span>
+                  <i class="material-icons">menu</i>
+              </div>
+            </header>
+            <div id="dw-s1" class="bmd-layout-drawer bg-faded kitchen-sink-drawer" aria-expanded="false" aria-hidden="true" style="background-color: transparent; pointer-events: auto;">
+              <header>
+                <!-- <a class="navbar-brand">Title</a> -->
+                <table class="table idm-ppm">
+                  <thead>
+                    <tr>
+                      <th>IDm</th>
+                      <th>PMm</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                  </tbody>
+                </table>
+              </header>
+              <!-- <ul class="list-group">
+                   <a class="list-group-item">Link 1</a>
+                   <a class="list-group-item">Link 2</a>
+                   <a class="list-group-item">Link 3</a>
+                   </ul> -->
+              <div class="table-responsive">
+                <table class="table table-striped table-hover history">
+                  <thead>
+                    <tr>
+                      <th>利用年月日</th>
+                      <th>端末</th>
+                      <th>処理</th>
+                      <th>入場駅</th>
+                      <th>出場駅</th>
+                      <th>残額</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+
+       <!-- <div class="col-md-12" style="position:absolute; width: 100%; height: 100%; background-color: transparent;">
+            <table class="table idm-ppm">
+            <thead>
+            <tr>
+            <th>IDm</th>
+            <th>PMm</th>
+            </tr>
+            </thead>
+            <tbody>
+            </tbody>
+            </table>
+            
+            <div class="table-responsive">
+            <table class="table table-striped table-hover history">
+            <thead>
+            <tr>
+            <th>利用年月日</th>
+            <th>端末</th>
+            <th>処理</th>
+            <th>入場駅</th>
+            <th>出場駅</th>
+            <th>残額</th>
+            </tr>
+            </thead>
+            <tbody>
+            </tbody>
+            </table>
+            </div> -->
+      </div>
+    </div>
+    <!-- 受信内容表示部分 -->
+    <ul id="message_area"></ul>
+  </div>
+</body>
+</html>
