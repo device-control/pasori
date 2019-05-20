@@ -395,7 +395,7 @@ jQuery(function ($) {
   map = new google.maps.Map(map_canvas, mapOptions);
 
   map.mapTypes.set('map_style', styledMap);
-  map.setMapTypeId('map_style');
+  map.setMapTypeId('OSM');
 
   var historyMarkers = new HistoryMarkerArray();
   var latlngMarker = new LatLngMarker(map, center);
