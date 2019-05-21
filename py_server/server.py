@@ -45,7 +45,7 @@ class StationRecord(object):
   @classmethod
   def get_station(cls, line_key, station_key):
     # 線区コードと駅コードに対応するStationRecordを検索する
-    for station in cls.get_db("StationCode.csv"):
+    for station in cls.get_db(os.path.dirname(__file__) + "/StationCode.csv"):
       if station.line_key == line_key and station.station_key == station_key:
         return station
     return cls.get_none()
@@ -219,7 +219,7 @@ def message_received(client, server, message):
 
 if __name__ == "__main__":
   print("read station_infos.yml")
-  station_infos = yaml.load(codecs.open('station_infos.yml', 'r', 'utf-8'))
+  station_infos = yaml.load(codecs.open(os.path.dirname(__file__) + '/station_infos.yml', 'r', 'utf-8'))
   print("open pasori")
   clf = nfc.ContactlessFrontend('usb')
   print("open websocket")
