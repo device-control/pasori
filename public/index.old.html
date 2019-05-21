@@ -1,0 +1,90 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>pasori reader</title>
+  
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+
+  <!-- 以下がgoogle map公式設定 -->
+  <script src="http://maps.googleapis.com/maps/api/js?sensor=false&region=JP"></script>
+  <!-- 以下だとログインユーザアイコンが表示される -->
+  <!-- <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true"></script> -->
+  <!-- 以下だとマップ名をプルダウンメニューが表示できる。 -->
+  <!-- <script src="https://maps.googleapis.com/maps/api/js?sensor=false&language=ja"></script> -->
+  <script src="client.js"></script>
+
+  <!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+  <!-- Optional theme -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
+  <!-- Latest compiled and minified JavaScript -->
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+  
+</head>
+<body>
+  <!-- コメントフォーム -->
+  <div class="container">
+    
+    <div class="form-inline">
+      <div class="form-group">
+        <label>PaSoRi端末接続先：</label>
+        <!-- <input type="text" class="form-control pasori-address" id="exampleInputName2" placeholder="172.0.0.1:3001" value="localhost:3001"> -->
+        <input class="form-control pasori-address" type="text" placeholder="127.0.0.1:3001" value="localhost:3001">
+        <input class="connect btn btn-primary" type="button" value="connect">
+        <input class="disconnect btn btn-primary" type="button" value="disconnect">
+        <label>状態：</label>
+        <label class="status"></label>
+      </div>
+    </div>
+
+    <div>
+      <p>
+        <input class="read btn btn-info" type="button" value="read">
+        <input class="clear btn btn-default" type="button" value="clear">
+      </p>
+    </div>
+    
+    <div class="row">
+      <div class="col-md-6">
+        <div id="map-canvas">
+        </div>
+      </div>
+      <div class="col-md-6">
+        <table class="table idm-ppm">
+          <thead>
+            <tr>
+              <th>IDm</th>
+              <th>PMm</th>
+            </tr>
+          </thead>
+          <tbody>
+          </tbody>
+        </table>
+        
+        <div class="table-responsive">
+          <table class="table table-striped table-hover history">
+            <thead>
+              <tr>
+                <th>利用年月日</th>
+                <th>端末</th>
+                <th>処理</th>
+                <th>入場駅</th>
+                <th>出場駅</th>
+                <th>残額</th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <!-- 受信内容表示部分 -->
+    <ul id="message_area"></ul>
+  </div>
+</body>
+</html>
