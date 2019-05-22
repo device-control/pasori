@@ -52,7 +52,7 @@
     </style>
   </head>
   <body>
-    <div class="container">
+    <div class="container-fluid">
       <form class="form-inline">
         <div class="form-group">
           <!-- <label>PaSoRi端末接続先：</label> -->
@@ -64,20 +64,18 @@
           <input type="button" class="connect btn btn-raised btn-primary" value="connect">
           <input type="button" class="disconnect btn btn-raised btn-primary" value="disconnect">
         </span>
+        <div class="form-group bmd-form-group">
+          <input class="read btn btn-raised btn-info" type="button" value="read">
+          <input class="clear btn btn-raised btn-default" type="button" value="clear">
+        </div>
         <span class="form-group bmd-form-group">
           <label>status:</label>
           <label class="status"></label>
         </span>
       </form>
-      <form class="form-inline">
-        <div class="form-group">
-          <input class="read btn btn-info" type="button" value="read">
-          <input class="clear btn btn-default" type="button" value="clear">
-        </div>
-      </form>
 
       <!-- <div class="col-md-12" style="position: relative; padding-bottom: 75%;"> -->
-      <div class="col-md-12" style="position: relative; padding-bottom: 80%;">
+      <div class="col-md-12" style="position: relative; padding-bottom: 50%;">
         <!-- <div id="map-canvas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"> -->
         <div id="map-canvas" style="position: absolute; top: 0px; left: 0px; width: 100%; height: 100%;">
         </div>
