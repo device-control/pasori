@@ -4,7 +4,7 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
     <title>pasori reader</title>
     <!-- CDN -->
     <!-- https://fezvrasta.github.io/bootstrap-material-design/ -->
@@ -49,7 +49,22 @@
        /* transform: translateX(-550px); */
        transform: translateX(110%);
      }
-    </style>
+
+     @media screen and (max-width: 420px) { 
+       /* 画面サイズ 499pxまで適用(177.77% = 100 / 9 x 16) */
+       .map_size {
+         position: relative;
+         padding-bottom: 177.77%;
+       }
+     }
+     @media screen and (min-width: 421px) {
+       /* 画面サイズ 1000px以上から適用(56.25% = 100 / 16 x 9) */
+       .map_size {
+         position: relative;
+         padding-bottom: 56.25%;
+       }
+     }
+    </style> 
   </head>
   <body>
     <div class="container-fluid">
@@ -75,7 +90,10 @@
       </form>
 
       <!-- <div class="col-md-12" style="position: relative; padding-bottom: 75%;"> -->
-      <div class="col-md-12" style="position: relative; padding-bottom: 50%;">
+      <!--   56.25% = 100 / 16 x 9 -->
+      <!--  177.77% = 100 / 9 x 16 -->
+      <!-- <div class="col-md-12" style="position: relative; padding-bottom: 177.77%;"> -->
+      <div class="col-md-12 map_size">
         <!-- <div id="map-canvas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"> -->
         <div id="map-canvas" style="position: absolute; top: 0px; left: 0px; width: 100%; height: 100%;">
         </div>
