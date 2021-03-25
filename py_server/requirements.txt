@@ -3,7 +3,7 @@ ndeflib==0.3.2
 nfcpy==0.13.5
 pyDes==2.0.1
 pyserial==3.4
-PyYAML==5.1
+PyYAML==5.4
 six==1.12.0
 websocket-client==0.56.0
 websocket-server==0.4
